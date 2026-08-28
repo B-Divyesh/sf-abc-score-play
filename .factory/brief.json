@@ -1,0 +1,12 @@
+{
+  "slug": "abc-score-play",
+  "title": "ABC Score Play",
+  "summary": "Write a short ABC score, hear it, loop bars, and print it.",
+  "territory": "games-creative",
+  "user": "Musicians and educators who want to write a short, shareable score in plain text and immediately play, loop, and print it.",
+  "smallest_useful_product": "Static web editor for ABC input with error highlighting, rendered staff, MIDI playback, bar looping, tempo practice, printable card, and URL fragment sharing.",
+  "artifact_class": "static-web",
+  "monetization": "free",
+  "constraints": "Use an open-source ABC renderer under a compatible license; make generated notation local and do not host copyrighted scores.",
+  "state": "BUILDING"
+}
