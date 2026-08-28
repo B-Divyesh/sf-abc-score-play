@@ -4,9 +4,28 @@
   "summary": "Write a short ABC score, hear it, loop bars, and print it.",
   "territory": "games-creative",
   "user": "Musicians and educators who want to write a short, shareable score in plain text and immediately play, loop, and print it.",
-  "smallest_useful_product": "Static web editor for ABC input with error highlighting, rendered staff, MIDI playback, bar looping, tempo practice, printable card, and URL fragment sharing.",
+  "evidence": [
+    {
+      "url": "https://news.ycombinator.com/item?id=43080175",
+      "date": "2025-02-17",
+      "quote_or_summary": "The asker asks why generative-music models are less popular than image and LLM tools, signalling demand around accessible music creation without treating generation as the product."
+    },
+    {
+      "url": "https://github.com/akashacms/pdf-document-construction-set/issues/96",
+      "date": "2026-07-15",
+      "quote_or_summary": "The issue requests ABCNotation because its simple notation fits Markdown for creating music scores."
+    }
+  ],
+  "recurrence": "Two independent 2025–26 requests point to text-native music workflows; the need is moderate but specific and well-bounded.",
+  "current_workaround": "Use MuseScore for notation, hand-format ABC, or share screenshots and separate audio files.",
+  "incumbents_and_gap": "MuseScore and Flat are full notation suites; ABC tools often render but do not make repeatable, learner-friendly playback the main interaction.",
+  "smallest_useful_product": "Static web editor for ABC input with error highlighting, rendered staff, MIDI playback, bar looping, tempo practice, printable card, and URL fragment sharing. Non-goals: AI composing, rights-managed sheet music, collaboration accounts.",
+  "success_measure": "40% of sessions reach a valid score and play a selected loop twice within five minutes.",
   "artifact_class": "static-web",
-  "monetization": "free",
+  "monetization": "free — a shareable standards-based utility benefits from zero sign-up.",
   "constraints": "Use an open-source ABC renderer under a compatible license; make generated notation local and do not host copyrighted scores.",
-  "state": "BUILDING"
+  "est_build_effort": "S",
+  "why_distinct": "It is a text-to-practice bridge, not an AI music generator or notation-suite clone.",
+  "confidence": 3,
+  "state": "BUILT"
 }
