@@ -1,61 +1,43 @@
-# ABC Score Play v1 repair handoff
+# ABC Score Play independent QA handoff
 
-## Release-blocking QA repair (2026-08-28 UTC): **PASS locally**
+## Release decision: **FAIL**
 
-This repair addresses the sole P1 finding in independent report `f73122c358323865a3f068dbefb229ceec4dac4f`, against candidate `1dce633d64ef014e5a4d29baf3dd3801e3f72e63`: undersized touch targets at the required 390 px viewport.
+Candidate `b570b354b30e71ee5db90024d7eb3e36198e9390` was independently tested on 2026-08-28 against <https://abc-score-play.sociobot.in>. Production serves byte-identical app assets for the candidate, so the result is based on the current deployment rather than the earlier reported deployment-only condition.
 
-The root cause was compact text links and transparent demo-strip buttons without a target-box minimum. The repair gives the wordmark, header links, demo actions, footer links, legal-page text links, error-line buttons, and range input a minimum 44 px target; the header and mobile navigation gaps retain at least 8 px separation. It keeps the existing instrument-panel visual system, routes, local storage, score editor, sample demo, and service worker behavior intact.
+The full report is in `.factory/verification-2.md`. No product code was changed.
 
-`tests/e2e/claims.spec.ts` now has exact regression coverage: at 390 × 844 it visits `/`, `/demo`, `/privacy`, and `/terms`, measures every visible semantic link/button/input/textarea/button-role target, and fails if either dimension is below 44 px. It also verifies skip-link keyboard reachability and Space playback/stop.
+## Release blockers
 
-## What was built
+1. In dark mode, Tab reveals a skip link with `#f7eed9` text on `#f8f1df`: **1.02:1** contrast. A focused-state axe scan reports a serious `color-contrast` violation. The existing axe test scans while the link is hidden and misses it.
+2. Unknown URLs return HTTP 200. `public/staticwebapp.config.json` rewrites 404 responses to `/index.html` with status 200, contrary to the required real 404 response.
+3. Claims coverage is incomplete: demo/real storage isolation and the public 40–220 BPM range are not fully listed and tested; the print claim test checks only `window.print()` invocation/status, not the promised clean print output.
 
-- A Vite + vanilla TypeScript static app for writing and rendering ABC notation.
-- Live staff rendering through MIT-licensed `abcjs`, loaded only when a score needs it.
-- Local Web Audio playback derived from the renderer’s pitch and timing data. No sound-font request or runtime CDN is used.
-- One-bar and multi-bar looping, 40–220 BPM practice tempo, stop control, playback highlight, staff-click bar selection, and Space-key play/stop.
-- Line-numbered ABC errors, with links that select the line to fix.
-- URL-fragment score sharing, print-only score cards, browser storage, and an offline service worker.
-- A separate `/demo` storage namespace with an original eight-bar score, reset action, and exit to the real editor.
-- SPA routes for `/`, `/demo`, `/privacy`, `/terms`, and a designed 404 state.
-- Responsive light and dark treatments, reduced-motion behavior, keyboard focus, and 390 px phone layout.
-- Original mid-century instrument-panel artwork in WebP and AVIF. Prompt and provenance are in `.factory/design.md`.
+## What passed
 
-## How to run
+- Mandatory first read and one-click sample demo.
+- All nine exact `.factory/claims.json` commands.
+- `npm ci`, `npm test` (3 unit + 13 browser tests), `npm run build`, TypeScript, and `npm audit --omit=dev`.
+- Valid-score rendering, playback/stop, two loop passes, 40/220 BPM clamping, 1/8 bar clamping, invalid-line selection and recovery, clearing/loading, fragment sharing, print CSS behavior, and demo namespace isolation.
+- Desktop and 390 px mobile layout, 44 px touch targets, keyboard operation, reduced motion, no horizontal overflow, and zero console/page errors.
+- Local-only traffic, restrictive response policies, offline reload, service-worker update, immutable hashed-asset caching, privacy/terms pages, and no account/payment/AI dependencies.
+- Live/local SHA-256 identity for the app JS, CSS, and lazy `abcjs` bundle.
+- Lighthouse mobile: home 96 performance/100 accessibility/100 best practices/100 SEO; demo 97/100/100/100. LCP was 1.1 s home and 1.8 s demo; CLS was 0 for both.
+- Bundles: 163.82 KB total JS gzip, 3.73 KB CSS gzip, 40,771-byte hero AVIF.
+
+There is no lint command, publishable library/CLI, backend/API, product-unlock endpoint, or sign-in flow; lint, consumer-install, rate-limit, backend concurrency/persistence, and Entra checks are therefore not applicable.
+
+## How to reproduce
 
 ```sh
-npm install
-npm run dev
+npm ci
 npm test
 npm run build
+npm audit --omit=dev
+npm run preview -- --port 4173
 ```
 
-The exact deploy command is `npm run build`. Output lands in `dist/`, with `dist/index.html` at the root.
+Then open `/demo` in a 390 × 844 Chromium context with dark color scheme and reduced motion, press Tab once, and run axe. Probe `https://abc-score-play.sociobot.in/missing-bar` with `curl` to observe HTTP 200. See `.factory/verification-2.md` for claim commands, hashes, routes, metrics, and exact functional evidence.
 
-## Verification completed
+## Next steps
 
-- Clean install: `npm ci` completed with 0 vulnerabilities. `npm audit --omit=dev` also returned 0 vulnerabilities.
-- Full test/type/build path: `npm test` passed 3 Vitest unit tests and 13 Chromium integration/browser tests. Its build step runs `tsc --noEmit` and `vite build`.
-- Every documented claim command passed independently: `@claim:sample-score`, `@claim:free-use`, `@claim:local-score`, `@claim:offline-reload`, `@claim:score-playback`, `@claim:bar-loop`, `@claim:score-link`, `@claim:print-card`, and `@claim:error-lines`.
-- Production build: `npm run build` produced `dist/index.html`. Initial app JS is 8.63 KB gzip, CSS is 3.72 KB gzip, and lazy `abcjs` is 154.59 KB gzip (163.55 KB combined when notation is rendered), within the static-product budgets. There is no lint script or publishable package/consumer artifact for this static app.
-- Browser checks: desktop 1440 × 900 and phone 390 × 844 rendered `/demo` with no page/console errors and no horizontal overflow. The mobile sweep found zero visible controls below 44 × 44 px across `/`, `/demo`, `/privacy`, and `/terms`.
-- Accessibility: the Playwright axe integration found zero serious or critical violations in normal, dark, and reduced-motion modes. Keyboard test reached the skip link with Tab and played/stopped the score with Space. `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/demo /tmp/abc-score-play-evidence-20260828` passed: HTTP 200, title, `lang=en`, one H1, main landmark, no images without alt, no unlabeled buttons, and no console/page errors.
-- Privacy/offline/update: the privacy claim intercepts the complete demo flow and rejects every cross-origin request. The offline claim reloads the demo after service-worker installation while offline. A separate update probe found an active controlling `/sw.js`, with no waiting or installing worker after `registration.update()`.
-- Response policy: the built `staticwebapp.config.json` was checked for same-origin default/connect CSP, strict-origin referrer policy, and `no-cache` service-worker policy. The app remains account-free, payment-free, analytics-free, and has no live AI/API identity to verify.
-- Lighthouse was attempted with the preinstalled Playwright Chromium, but Lighthouse could not attach to that binary in this container (`Unable to connect to Chrome`). Direct browser, axe, bundle, and response-policy checks above completed.
-
-## Final repair evidence and deployment
-
-- Re-ran the clean install, full suite, TypeScript production build, and each command listed in `.factory/claims.json`. All completed successfully. There is no separate lint or package/consumer command because this is a non-publishable Vite static web app.
-- Re-ran `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/demo /tmp/abc-score-play-evidence-20260828`: HTTP 200; `Demo — ABC Score Play`; `lang=en`; one H1; main landmark; no missing image alt text, unlabeled buttons, console errors, or page errors.
-- Manual Playwright smoke checks at 1440 × 900 and 390 × 844 loaded `/demo`, rendered the score, reported no browser errors, and found no horizontal overflow. The exact mobile target regression test continues to pass across `/`, `/demo`, `/privacy`, and `/terms`.
-- Service-worker update probe: the local demo was controlled by `/sw.js`, its registration had an active worker, and after `registration.update()` there was no waiting or installing worker. The existing Playwright axe integration passed with zero serious or critical findings in normal, dark, and reduced-motion mobile modes.
-- Deployment: repair commit `c01bf3e43ba9fbd8967da8ee30270773f09fe8d3` is `origin/main` and is live at `https://abc-score-play.sociobot.in/demo`. SHA-256 matched live-to-`dist` for `assets/index-mfBdgImH.css` (`9fe0ac095d70ae180599d1e1a7a98418ef43339ef09fed5b54e17ff05064cf64`) and `assets/index-8WdMIQoD.js` (`2182f2f2a572bb0914e466a651acaa862894b20fed3f25095ca3aced05b011b5`). Live response headers retain the configured same-origin CSP, strict-origin referrer policy, `nosniff`, HSTS, and restrictive permissions policy.
-
-## Known gaps and next steps
-
-- Playback uses a clean local triangle-wave voice instead of sampled instruments. This keeps scores private and removes sound-font downloads, but it is not a realistic piano sound.
-- The v1 supports the ABC subset parsed by `abcjs`; advanced multi-voice scores may produce renderer warnings. Warnings remain visible beside the editor.
-- Browser interaction latency still needs field data for INP. Lighthouse could not attach to the supplied Chromium in this repair container, though the direct browser checks passed.
-
-These are v1 tradeoffs, not blockers for the brief’s short-score practice job. The independent report remains in `.factory/verification.md` as the original finding; this handoff records the repair evidence.
+Fix all three blockers, add regression coverage for the focus-revealed dark skip link and true 404 status, complete the claim catalog/tests, deploy the repaired commit, and repeat independent verification.
