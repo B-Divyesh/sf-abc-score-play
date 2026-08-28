@@ -1,0 +1,27 @@
+{
+  "name": "abc-score-play",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "npm run test:unit && npm run build && playwright test",
+    "test:unit": "vitest run tests/abc-engine.test.ts",
+    "test:e2e": "npm run build && playwright test"
+  },
+  "dependencies": {
+    "abcjs": "6.7.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.58.2",
+    "@types/node": "24.3.0",
+    "sharp": "0.35.4",
+    "typescript": "5.9.2",
+    "vite": "7.3.6",
+    "vitest": "3.2.7"
+  }
+}
