@@ -1,5 +1,13 @@
 # ABC Score Play v1 handoff
 
+## Independent verifier result (2026-08-28 UTC): **FAIL**
+
+Candidate `1dce633d64ef014e5a4d29baf3dd3801e3f72e63` was independently checked against <https://abc-score-play.sociobot.in>. The live deployment matches the candidate’s built JS, CSS, and lazy ABC renderer byte-for-byte. All nine required claim commands, `npm test` (3 unit + 11 Chromium tests), and `npm run build` passed.
+
+The release is nonetheless blocked: at the required 390 px viewport, several interactive targets are smaller than 44 × 44 CSS px. Measured examples: header Demo 34 × 22, header Editor 50 × 22, Reset demo 95 × 36, Start for real 128 × 36, footer Privacy 52 × 19, and footer Terms 37 × 19. This violates the non-negotiable mobile accessibility/touch-target contract. See `.factory/verification.md` for the complete evidence, including claims, privacy, PWA, route/header, axe, keyboard, and bundle checks.
+
+**Next step:** enlarge every mobile interactive target to at least 44 × 44 px, preserve adjacent spacing, and rerun independent verification.
+
 ## What was built
 
 - A Vite + vanilla TypeScript static app for writing and rendering ABC notation.
