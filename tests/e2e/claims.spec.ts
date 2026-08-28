@@ -30,6 +30,23 @@ test('@claim:local-score Score text stays in the browser', async ({ page }) => {
   expect(crossOrigin).toEqual([]);
 });
 
+test('@claim:demo-isolation Demo edits never replace the real score', async ({ page }) => {
+  const realScore = 'X:1\nT:REAL-MARKER\nM:4/4\nL:1/4\nK:C\n| C D E F |';
+  const demoScore = 'X:1\nT:DEMO-MARKER\nM:4/4\nL:1/4\nK:C\n| G A B c |';
+  await page.addInitScript(({ real, demo }) => {
+    localStorage.setItem('abc-score-play:score', real);
+    localStorage.setItem('demo:abc-score-play:score', demo);
+  }, { real: realScore, demo: demoScore });
+  await page.goto('/demo');
+  await expect(page.locator('#abc-source')).toHaveValue(demoScore);
+  await page.getByRole('button', { name: 'Start for real' }).click();
+  await expect(page.locator('#abc-source')).toHaveValue(realScore);
+  await expect.poll(() => page.evaluate(() => ({
+    real: localStorage.getItem('abc-score-play:score'),
+    demo: localStorage.getItem('demo:abc-score-play:score')
+  }))).toEqual({ real: realScore, demo: null });
+});
+
 test('@claim:offline-reload The demo reloads offline after one visit', async ({ page, context }) => {
   await page.goto('/demo');
   await expect(page.locator('#paper svg')).toBeVisible();
@@ -62,6 +79,24 @@ test('@claim:bar-loop A selected bar repeats twice', async ({ page }) => {
   await page.getByRole('button', { name: 'Stop' }).click();
 });
 
+test('@claim:tempo-range Practice tempo accepts 40 through 220 BPM and clamps outside values', async ({ page }) => {
+  await page.goto('/demo');
+  await expect(page.locator('#paper svg')).toBeVisible();
+  const tempo = page.locator('#tempo-number');
+  await tempo.fill('40');
+  await tempo.press('Enter');
+  await expect(tempo).toHaveValue('40');
+  await tempo.fill('220');
+  await tempo.press('Enter');
+  await expect(tempo).toHaveValue('220');
+  await tempo.fill('39');
+  await tempo.press('Enter');
+  await expect(tempo).toHaveValue('40');
+  await tempo.fill('221');
+  await tempo.press('Enter');
+  await expect(tempo).toHaveValue('220');
+});
+
 test('@claim:score-link A score link restores the score', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: 'http://127.0.0.1:4173' });
   const requestedUrls: string[] = [];
@@ -78,7 +113,7 @@ test('@claim:score-link A score link restores the score', async ({ page, context
   expect(requestedUrls.some((url) => url.includes('score='))).toBe(false);
 });
 
-test('@claim:print-card The print action opens a print view', async ({ page }) => {
+test('@claim:print-card The print action opens a clean print view', async ({ page }) => {
   await page.addInitScript(() => {
     (window as Window & { printCalled?: boolean }).print = () => { (window as Window & { printCalled?: boolean }).printCalled = true; };
   });
@@ -87,6 +122,13 @@ test('@claim:print-card The print action opens a print view', async ({ page }) =
   await page.getByRole('button', { name: 'Print score card' }).click();
   expect(await page.evaluate(() => (window as Window & { printCalled?: boolean }).printCalled)).toBe(true);
   await expect(page.locator('#app-status')).toHaveText('Print view opened.');
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await expect(page.locator('.site-header')).toBeHidden();
+  await expect(page.locator('.demo-strip')).toBeHidden();
+  await expect(page.locator('.editor-panel')).toBeHidden();
+  await expect(page.locator('#transport')).toBeHidden();
+  await expect(page.locator('.site-footer')).toBeHidden();
 });
 
 test('@claim:error-lines Invalid ABC points to the line to fix', async ({ page }) => {
@@ -110,6 +152,19 @@ test('site structure, mobile layout, and accessibility baseline', async ({ page 
   await expect(page.locator('#paper svg')).toBeVisible();
   const darkResults = await new AxeBuilder({ page: page as never }).analyze();
   expect(darkResults.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
+});
+
+test('regression: the focused skip link passes axe contrast checks in light and dark modes', async ({ page }) => {
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme, reducedMotion: 'reduce' });
+    await page.goto('/demo');
+    await expect(page.locator('#paper svg')).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(page.locator('.skip-link')).toBeFocused();
+    await expect(page.locator('.skip-link')).toBeVisible();
+    const results = await new AxeBuilder({ page: page as never }).analyze();
+    expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
+  }
 });
 
 test('regression: every visible mobile control has a 44 by 44 touch target', async ({ page }) => {
