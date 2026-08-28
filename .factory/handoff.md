@@ -1,27 +1,28 @@
-# ABC Score Play polish 1 handoff
+# ABC Score Play review 2 handoff
 
 ## Outcome
 
-**PASS and deployed.** All 18 findings in `.factory/review-1.md`, including every minor item, are resolved. The implementation commit is `5c7534f` on `main`, based on review commit `238a1780f463df995bf255d450d24dbc122e7f70` and released candidate `a3f0b10a8b3d97efb241efe57f0c44895c9354c0`.
+**PASS with zero findings.** This independent adversarial review made no product-code changes. It confirmed that all 18 findings in `.factory/review-1.md` are actually fixed live and in code.
 
 Production: <https://abc-score-play.sociobot.in>
 
 One-click isolated demo: <https://abc-score-play.sociobot.in/?demo=1>
 
-The static-web/Vite artifact and mid-century instrument-panel identity are unchanged. The demo now begins with the real seeded score and controls, then the populated editor. Start for real, direct editor links, and history navigation move focus to the visible destination. File open/download, route-specific raw metadata, complete 404/legal chrome, and observable audio tests are included.
+The static-web/Vite artifact and mid-century instrument-panel identity are unchanged. The demo begins with its seeded score and controls, then the populated editor. Start for real, direct editor links, and history navigation move focus to the visible destination. File open/download, route-specific raw metadata, complete 404/legal chrome, and observable audio tests are included.
 
-The finding-by-finding acceptance map is in `.factory/polish-1.md`.
+The full review, copy audit, sandbox evidence, claim results, structure check, and earlier-finding acceptance map are in `.factory/review-2.md`.
 
-## Exact verification evidence
+## Verification evidence
 
-Fresh clone `/tmp/abc-polish-clean.NoUYJA` at `5c7534f`:
+Fresh clone `/tmp/abc-score-play-review-2.G89ilc` at `4af2b71`:
 
 - All 14 exact commands in `.factory/claims.json`: PASS independently.
 - `npm test`: PASS — 5 Vitest tests and 22 Chromium browser tests.
 - `npm run lint`: PASS.
 - `npm audit --omit=dev`: PASS — zero vulnerabilities.
 - `npm run build`: PASS — `dist/index.html` plus route-specific HTML emitted.
-- `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/?demo=1`: PASS — HTTP 200, title, `lang=en`, one H1, main, image alt, button labels, and zero console/page errors.
+- Live cold checks at 390 × 844 and 1440 × 900: PASS — clear first screen, no console/page errors, and no cross-origin requests.
+- Live offline reload after service-worker readiness: PASS — sample H1 and staff persisted while offline.
 
 Browser and accessibility coverage includes 390×844 and desktop layouts, all public routes, light/dark and reduced-motion states, 44px targets, keyboard Space playback, skip-link focus, back/forward focus, raw route heads, HTTP 404, print media, import/export, clipboard sharing, Web Audio instrumentation, privacy request interception, demo namespace isolation/reset, service worker, and offline reload. Axe found zero serious/critical issues. Lighthouse produced:
 
