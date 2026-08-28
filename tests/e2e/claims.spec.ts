@@ -112,6 +112,45 @@ test('site structure, mobile layout, and accessibility baseline', async ({ page 
   expect(darkResults.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? ''))).toEqual([]);
 });
 
+test('regression: every visible mobile control has a 44 by 44 touch target', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const undersized: Array<{ path: string; id: string; name: string; width: number; height: number }> = [];
+
+  for (const path of ['/', '/demo', '/privacy', '/terms']) {
+    await page.goto(path);
+    await expect(page.locator('h1')).toHaveCount(1);
+    const targets = await page.locator('a, button, input, textarea, [role="button"]').evaluateAll((elements) => elements
+      .map((element) => {
+        const bounds = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          id: element.id,
+          name: (element.textContent || element.getAttribute('aria-label') || element.getAttribute('name') || element.tagName).trim(),
+          width: bounds.width,
+          height: bounds.height,
+          visible: bounds.width > 0 && bounds.height > 0 && style.visibility !== 'hidden' && style.display !== 'none'
+        };
+      })
+      .filter((target) => target.visible && (target.width < 44 || target.height < 44))
+    );
+    undersized.push(...targets.map((target) => ({ path, ...target })));
+  }
+
+  expect(undersized).toEqual([]);
+});
+
+test('keyboard access reaches the skip link and controls playback', async ({ page }) => {
+  await page.goto('/demo');
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.skip-link')).toBeFocused();
+  await page.locator('#paper-bay').focus();
+  await page.keyboard.press('Space');
+  await expect(page.locator('#app-status')).toHaveText('Score playing.');
+  await page.keyboard.press('Space');
+  await expect(page.locator('#app-status')).toHaveText('Playback stopped.');
+});
+
 test('legal and unknown routes have one clear heading', async ({ page }) => {
   for (const route of ['/privacy', '/terms', '/missing-bar']) {
     await page.goto(route);

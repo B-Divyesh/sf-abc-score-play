@@ -1,12 +1,12 @@
-# ABC Score Play v1 handoff
+# ABC Score Play v1 repair handoff
 
-## Independent verifier result (2026-08-28 UTC): **FAIL**
+## Release-blocking QA repair (2026-08-28 UTC): **PASS locally**
 
-Candidate `1dce633d64ef014e5a4d29baf3dd3801e3f72e63` was independently checked against <https://abc-score-play.sociobot.in>. The live deployment matches the candidate’s built JS, CSS, and lazy ABC renderer byte-for-byte. All nine required claim commands, `npm test` (3 unit + 11 Chromium tests), and `npm run build` passed.
+This repair addresses the sole P1 finding in independent report `f73122c358323865a3f068dbefb229ceec4dac4f`, against candidate `1dce633d64ef014e5a4d29baf3dd3801e3f72e63`: undersized touch targets at the required 390 px viewport.
 
-The release is nonetheless blocked: at the required 390 px viewport, several interactive targets are smaller than 44 × 44 CSS px. Measured examples: header Demo 34 × 22, header Editor 50 × 22, Reset demo 95 × 36, Start for real 128 × 36, footer Privacy 52 × 19, and footer Terms 37 × 19. This violates the non-negotiable mobile accessibility/touch-target contract. See `.factory/verification.md` for the complete evidence, including claims, privacy, PWA, route/header, axe, keyboard, and bundle checks.
+The root cause was compact text links and transparent demo-strip buttons without a target-box minimum. The repair gives the wordmark, header links, demo actions, footer links, legal-page text links, error-line buttons, and range input a minimum 44 px target; the header and mobile navigation gaps retain at least 8 px separation. It keeps the existing instrument-panel visual system, routes, local storage, score editor, sample demo, and service worker behavior intact.
 
-**Next step:** enlarge every mobile interactive target to at least 44 × 44 px, preserve adjacent spacing, and rerun independent verification.
+`tests/e2e/claims.spec.ts` now has exact regression coverage: at 390 × 844 it visits `/`, `/demo`, `/privacy`, and `/terms`, measures every visible semantic link/button/input/textarea/button-role target, and fails if either dimension is below 44 px. It also verifies skip-link keyboard reachability and Space playback/stop.
 
 ## What was built
 
@@ -34,35 +34,20 @@ The exact deploy command is `npm run build`. Output lands in `dist/`, with `dist
 
 ## Verification completed
 
-- `npm test`: passed 3 unit tests and 11 Chromium tests.
-- `npm test -- --grep @claim:bar-loop`: passed as an individual claim command.
-- `npm run build`: passed with TypeScript checking; initial app JavaScript is 8.63 KB gzip, CSS is 3.67 KB gzip, and the lazy ABC renderer is 154.59 KB gzip.
-- `npm audit`: 0 vulnerabilities.
-- `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/demo …`: passed with no console errors, one H1, one main landmark, `lang=en`, and no missing alt text.
-- Playwright axe scan: no serious or critical issues in light mode, dark mode, or reduced-motion mode.
-- Phone check: 390 × 844, no horizontal document overflow.
-- Offline claim: loaded `/demo`, waited for the service worker, reloaded online, switched the context offline, and reloaded the rendered score.
-- Privacy claim: the full demo edit flow made no cross-origin requests.
-
-## Lighthouse-class measurement
-
-Lighthouse 12.8.2, mobile defaults, local production preview, 2026-08-28:
-
-| Category or metric | Result |
-| --- | ---: |
-| Performance | 100 |
-| Accessibility | 100 |
-| Best practices | 100 |
-| SEO | 100 |
-| Largest Contentful Paint | 1.4 s |
-| Total Blocking Time | 50 ms |
-| Cumulative Layout Shift | 0 |
-| First-load transfer | 54 KiB |
+- Clean install: `npm ci` completed with 0 vulnerabilities. `npm audit --omit=dev` also returned 0 vulnerabilities.
+- Full test/type/build path: `npm test` passed 3 Vitest unit tests and 13 Chromium integration/browser tests. Its build step runs `tsc --noEmit` and `vite build`.
+- Every documented claim command passed independently: `@claim:sample-score`, `@claim:free-use`, `@claim:local-score`, `@claim:offline-reload`, `@claim:score-playback`, `@claim:bar-loop`, `@claim:score-link`, `@claim:print-card`, and `@claim:error-lines`.
+- Production build: `npm run build` produced `dist/index.html`. Initial app JS is 8.63 KB gzip, CSS is 3.72 KB gzip, and lazy `abcjs` is 154.59 KB gzip (163.55 KB combined when notation is rendered), within the static-product budgets. There is no lint script or publishable package/consumer artifact for this static app.
+- Browser checks: desktop 1440 × 900 and phone 390 × 844 rendered `/demo` with no page/console errors and no horizontal overflow. The mobile sweep found zero visible controls below 44 × 44 px across `/`, `/demo`, `/privacy`, and `/terms`.
+- Accessibility: the Playwright axe integration found zero serious or critical violations in normal, dark, and reduced-motion modes. Keyboard test reached the skip link with Tab and played/stopped the score with Space. `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/demo /tmp/abc-score-play-evidence-20260828` passed: HTTP 200, title, `lang=en`, one H1, main landmark, no images without alt, no unlabeled buttons, and no console/page errors.
+- Privacy/offline/update: the privacy claim intercepts the complete demo flow and rejects every cross-origin request. The offline claim reloads the demo after service-worker installation while offline. A separate update probe found an active controlling `/sw.js`, with no waiting or installing worker after `registration.update()`.
+- Response policy: the built `staticwebapp.config.json` was checked for same-origin default/connect CSP, strict-origin referrer policy, and `no-cache` service-worker policy. The app remains account-free, payment-free, analytics-free, and has no live AI/API identity to verify.
+- Lighthouse was attempted with the preinstalled Playwright Chromium, but Lighthouse could not attach to that binary in this container (`Unable to connect to Chrome`). Direct browser, axe, bundle, and response-policy checks above completed.
 
 ## Known gaps and next steps
 
 - Playback uses a clean local triangle-wave voice instead of sampled instruments. This keeps scores private and removes sound-font downloads, but it is not a realistic piano sound.
 - The v1 supports the ABC subset parsed by `abcjs`; advanced multi-voice scores may produce renderer warnings. Warnings remain visible beside the editor.
-- Browser interaction latency needs field data for INP. The lab run recorded no user interaction sample; total blocking time was 50 ms.
+- Browser interaction latency still needs field data for INP. Lighthouse could not attach to the supplied Chromium in this repair container, though the direct browser checks passed.
 
-These are v1 tradeoffs, not blockers for the brief’s short-score practice job.
+These are v1 tradeoffs, not blockers for the brief’s short-score practice job. The independent report remains in `.factory/verification.md` as the original finding; this handoff records the repair evidence.
