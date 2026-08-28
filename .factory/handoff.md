@@ -62,3 +62,35 @@ Deployed `dist/` to production with Azure Static Web Apps CLI on 2026-08-28 UTC.
 ## Known gaps
 
 None in the repaired product scope.
+
+---
+
+# Independent verification 3 handoff
+
+## Release decision
+
+**PASS.** Independent QA verified candidate `a3f0b10a8b3d97efb241efe57f0c44895c9354c0` against <https://abc-score-play.sociobot.in> on 2026-08-28 UTC. The live deployment’s application bundles, service worker, assets, routing documents, and static content match the fresh candidate build byte-for-byte for the sampled complete product surface.
+
+## What was verified
+
+- Every declared claim command in `.factory/claims.json`, then all 11 tagged claim tests together: PASS.
+- Clean install, full suite (4 Vitest + 16 Chromium), typecheck, lint, production build, and production audit: PASS.
+- Live cold-read gate, normal ABC authoring/play/stop/loop workflow, invalid-input recovery, tempo boundaries, local storage isolation, share fragment restoration, print media, desktop/mobile, keyboard, reduced motion, focused dark skip link, axe serious/critical, offline reload, service-worker update, headers, cache policy, and deployment byte identity: PASS.
+- No server/API, payment, account, AI, analytics, third-party request, or identity flow exists; rate limiting, consumer-install, and Entra checks are not applicable.
+
+## How to verify again
+
+```sh
+npm ci
+npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run preview -- --port 4173
+```
+
+Open `/demo` for the isolated bundled score. The comprehensive evidence is in `.factory/verification-3.md`.
+
+## Known gaps
+
+No product defects found. Lighthouse CLI could not complete in this container because its supplied Chromium tab crashed; independent live browser, axe, response-header, offline, and bundle-budget checks passed.
