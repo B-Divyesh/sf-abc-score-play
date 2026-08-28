@@ -44,6 +44,14 @@ The exact deploy command is `npm run build`. Output lands in `dist/`, with `dist
 - Response policy: the built `staticwebapp.config.json` was checked for same-origin default/connect CSP, strict-origin referrer policy, and `no-cache` service-worker policy. The app remains account-free, payment-free, analytics-free, and has no live AI/API identity to verify.
 - Lighthouse was attempted with the preinstalled Playwright Chromium, but Lighthouse could not attach to that binary in this container (`Unable to connect to Chrome`). Direct browser, axe, bundle, and response-policy checks above completed.
 
+## Final repair evidence and deployment
+
+- Re-ran the clean install, full suite, TypeScript production build, and each command listed in `.factory/claims.json`. All completed successfully. There is no separate lint or package/consumer command because this is a non-publishable Vite static web app.
+- Re-ran `/opt/fleet/lib/verify-url.sh http://127.0.0.1:4173/demo /tmp/abc-score-play-evidence-20260828`: HTTP 200; `Demo — ABC Score Play`; `lang=en`; one H1; main landmark; no missing image alt text, unlabeled buttons, console errors, or page errors.
+- Manual Playwright smoke checks at 1440 × 900 and 390 × 844 loaded `/demo`, rendered the score, reported no browser errors, and found no horizontal overflow. The exact mobile target regression test continues to pass across `/`, `/demo`, `/privacy`, and `/terms`.
+- Service-worker update probe: the local demo was controlled by `/sw.js`, its registration had an active worker, and after `registration.update()` there was no waiting or installing worker. The existing Playwright axe integration passed with zero serious or critical findings in normal, dark, and reduced-motion mobile modes.
+- Deployment: repair commit `c01bf3e43ba9fbd8967da8ee30270773f09fe8d3` is `origin/main` and is live at `https://abc-score-play.sociobot.in/demo`. SHA-256 matched live-to-`dist` for `assets/index-mfBdgImH.css` (`9fe0ac095d70ae180599d1e1a7a98418ef43339ef09fed5b54e17ff05064cf64`) and `assets/index-8WdMIQoD.js` (`2182f2f2a572bb0914e466a651acaa862894b20fed3f25095ca3aced05b011b5`). Live response headers retain the configured same-origin CSP, strict-origin referrer policy, `nosniff`, HSTS, and restrictive permissions policy.
+
 ## Known gaps and next steps
 
 - Playback uses a clean local triangle-wave voice instead of sampled instruments. This keeps scores private and removes sound-font downloads, but it is not a realistic piano sound.
