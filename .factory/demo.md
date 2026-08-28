@@ -2,14 +2,14 @@
 
 ## Entry point
 
-- Local: `http://localhost:4173/demo` after `npm run build && npm run preview -- --port 4173`
-- Production: `https://abc-score-play.sociobot.in/demo`
+- Local: `http://localhost:4173/?demo=1` after `npm run build && npm run preview -- --port 4173`
+- Production: `https://abc-score-play.sociobot.in/?demo=1`
 
-The catalog can use `/demo` directly. No account or setup is required.
+The catalog can use `?demo=1` directly. `/demo` remains an equivalent shareable route. No account or setup is required.
 
 ## Sample data
 
-The demo bundles “Evening Scale Study,” an original eight-bar tune in G major. It includes repeats, a 4/4 meter, and a practice tempo of 104 beats per minute. The first screen shows its ABC source and rendered staff.
+The demo bundles “Evening Scale Study,” an original eight-bar tune in G major. It includes repeats, a 4/4 meter, and a practice tempo of 104 beats per minute. The first phone screen shows its rendered staff, bar count, and playback controls. Its populated ABC editor follows in the same workbench.
 
 ## Isolation and reset
 
@@ -21,7 +21,7 @@ Use **Reset demo** in the persistent banner to restore the bundled score. Use **
 
 From a fresh browser context:
 
-1. Open `/demo` and wait for the eight-bar staff.
+1. Open `/?demo=1` and wait for the eight-bar staff.
 2. Play the score, then stop it.
 3. Set bar 1 to bar 1, raise the tempo to 220, and play the loop twice.
 4. Edit the ABC and confirm the demo storage key changes.

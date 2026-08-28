@@ -1,5 +1,5 @@
-const CACHE = 'abc-score-play-v2';
-const CORE = ['/', '/demo', '/privacy', '/terms', '/favicon.svg', '/assets/abc-score-play-hero.webp'];
+const CACHE = 'abc-score-play-v3';
+const CORE = ['/', '/?demo=1', '/demo', '/privacy', '/terms', '/favicon.svg', '/assets/abc-score-play-hero.webp'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
