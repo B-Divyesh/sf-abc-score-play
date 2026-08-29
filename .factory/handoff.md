@@ -1,27 +1,26 @@
-# Independent verification 6 handoff
+# Adversarial review 6 handoff
 
 ## Outcome
 
-**PASS — release approved.** Independent QA tested commit
-`b3f33c9636f6798dac87dcca5c0b91af9fd58eb2` against
-<https://abc-score-play.sociobot.in> on 2026-08-29 UTC. The production deployment
-matches the candidate build for all 17 publicly shipped files, and no defects
-were found by severity.
+**FAIL.** Review 6 found four issues: one blocking reopened copy finding and three major claim-governance findings. No product code was modified.
 
-## What was independently verified
+- F-6-1 / reopened F-1-9: the blank editor placeholder still uses unexplained “headers” jargon.
+- F-6-2: privacy/no-upload tests ignore same-origin request bodies and could pass after an upload regression.
+- F-6-3: the README and claim omit the actual 1 MB ABC-file limit.
+- F-6-4: “Clearing browser storage also removes it” is not registered or tested.
 
-- Clean `npm ci`; every one of the 18 exact `.factory/claims.json` test commands;
-  aggregate `npm test` (8 unit/config + 26 Chromium tests); typecheck; lint; and
-  production build all passed.
-- Cold first-read satisfies the plain-words contract and exposes the one-click
-  “Try it with sample data” path. Desktop and 390px mobile end-to-end checks
-  covered playback/stop, invalid-input line recovery, demo reset, keyboard
-  focus, service-worker update state, and offline demo reload.
-- Live request logging found same-origin requests only, with no console/page
-  errors. Headers, CSP, cache policy, routes, static bundle sizes, axe, and the
-  supplied `verify-url.sh` checks passed.
+The complete evidence, rewrites, claim results, and 30-item historical regression map are in [review-6.md](review-6.md).
 
-Run the verification locally with:
+## Verification completed
+
+- Cold live Chromium at 390×844 and 1440×900; first screen, one-click demo, Reset, Start for real, all demo exits, storage isolation, request log, service worker, and offline reload.
+- Every one of the 18 exact `.factory/claims.json` commands from clean clone `/tmp/abc-score-play-review6-clean.BorGxv/repo` at `be9425b6481b30621f7b441e520ba5a5cb981817`.
+- Aggregate `npm test`: 8 Vitest tests and 26 Chromium tests passed.
+- `npm run typecheck`, `npm run lint`, and `npm run build` passed; `dist/` was produced.
+- Live route/link crawl, raw/runtime metadata, focus/back/forward, security headers, six-route Axe scan, and `/opt/fleet/lib/verify-url.sh` on home and demo.
+- All 17 publicly served files matched the clean `dist/` build byte-for-byte. JavaScript totals 164,433 bytes gzip.
+
+## How to reproduce
 
 ```sh
 npm ci
@@ -31,52 +30,12 @@ npm run lint
 npm run build
 ```
 
-See [verification-6.md](verification-6.md) for the exact evidence, claim list,
-response/header checks, and the non-product Lighthouse CLI limitation.
-
----
-
-# ABC Score Play perfection-loop 5 handoff
-
-## Outcome
-
-**PASS.** All findings from adversarial reviews 1–5 are closed in implementation commits `49b2216b` and `53390f4b`. Review 2 had zero findings. The final build is live at <https://abc-score-play.sociobot.in>, and its isolated one-click sample is <https://abc-score-play.sociobot.in/?demo=1>.
-
-The repair preserves the mid-century instrument-panel design and static-web artifact class. It adds complete claim coverage for sample loading, clearing, staff selection, and Space playback; discards demo data on every exit; proves a real two-bar audio loop; and gives every route the accurate skip-link label. The loop work also fixed a silent extracted-score bug, and the live audit closed a staff-click console error before the final redeploy.
-
-## Exact verification evidence
-
-- Final clean clone: `/tmp/abc-score-play-polish5-final.qC82pF/repo` at `53390f4b`.
-- Locked install: `npm ci` passed.
-- Every one of the 18 exact `.factory/claims.json` commands passed independently: `sample-score`, `free-use`, `local-score`, `demo-isolation`, `offline-reload`, `score-playback`, `bar-loop`, `tempo-range`, `live-render`, `abc-file-open`, `abc-file-download`, `score-link`, `print-card`, `error-lines`, `sample-load`, `clear-editor`, `staff-bar-selection`, and `keyboard-playback`.
-- Full `npm test` passed: 8 Vitest unit/config tests and 26 Chromium integration/browser tests in 31.8 seconds.
-- `npm run typecheck`, `npm run lint`, and `npm run build` passed. `dist/index.html` exists.
-- `npm audit --omit=dev` found zero vulnerabilities.
-- `/opt/fleet/lib/verify-url.sh` passed on live home and demo: correct title, `lang=en`, one H1, main landmark, complete alt text, labeled buttons, and zero console errors.
-- Axe found zero serious or critical issues on `/`, `/?demo=1`, `/demo`, `/privacy`, `/terms`, and the real 404 at 390×844. Dark/reduced-motion coverage remains in the browser suite.
-- Live Lighthouse mobile: home 100 performance / 100 accessibility / 100 best practices / 100 SEO, LCP 1.13 s, TBT 28 ms, CLS 0; demo 99/100/100/100, LCP 1.82 s, TBT 70 ms, CLS 0.00035.
-- Live privacy exercise recorded zero cross-origin requests, zero request bodies, and zero normal-route console errors. Demo exit removed only `demo:abc-score-play:score`.
-- A cold live service-worker visit and offline reload retained the Demo title, eight-bar score, and `/sw.js` controller.
-- All 17 public deployment files match the final `dist/` byte-for-byte. Final Azure deployment: `e85e106f-57f5-443c-9cb9-bde6505cec76`.
-
-Evidence is under [`.factory/evidence/polish-5`](evidence/polish-5), including [the live audit](evidence/polish-5/live-audit.json), [deployed-file hashes](evidence/polish-5/deployed-files.json), screenshots, verifier reports, and Lighthouse JSON. The cumulative finding map is [`.factory/polish-5.md`](polish-5.md).
-
-## Run and verify
+Run each claim with its exact command from `.factory/claims.json`, for example:
 
 ```sh
-npm ci
-npm test
-npm run typecheck
-npm run lint
-npm run build
+npm test -- --grep @claim:abc-file-open
 ```
 
-Run any public claim with its exact command from `.factory/claims.json`, for example:
+## Next steps
 
-```sh
-npm test -- --grep @claim:bar-loop
-```
-
-## Known gaps and next steps
-
-None in the researched scope. No infrastructure, DNS, billing, account, API, analytics, or AI work is required.
+Repair only the four findings above, add the specified regression checks, deploy through the factory workflow, and repeat the live review. Infrastructure, DNS, billing, accounts, analytics, and AI are out of scope.
