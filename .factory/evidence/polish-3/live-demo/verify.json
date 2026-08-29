@@ -1,0 +1,14 @@
+{
+  "url": "https://abc-score-play.sociobot.in/?demo=1",
+  "loadMs": 980,
+  "errors": [],
+  "a11y": {
+    "title": "Demo — ABC Score Play",
+    "lang": "en",
+    "h1": 1,
+    "main": true,
+    "imgsMissingAlt": 0,
+    "buttonsUnlabeled": 0,
+    "textLength": 828
+  }
+}

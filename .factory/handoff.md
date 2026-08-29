@@ -1,28 +1,46 @@
-# ABC Score Play review 3 handoff
+# ABC Score Play polish 3 handoff
 
 ## Outcome
 
-**FAIL — three minor copy findings.** This review made no product-code changes. The deployed product is clear and functional, but the zero-findings standard is not met because three landing eyebrows are decorative rather than useful section names.
+**PASS — zero findings remain.** All 18 findings from review 1 remain fixed, review 2 had no findings, and F-3-1 through F-3-3 are now closed with plain section names and a browser regression test.
 
-Production: <https://abc-score-play.sociobot.in>
-One-click isolated demo: <https://abc-score-play.sociobot.in/?demo=1>
+- Production: <https://abc-score-play.sociobot.in>
+- One-click isolated demo: <https://abc-score-play.sociobot.in/?demo=1>
+- Repair commit: `322ba5c8bdda41b2aa1a4ab5bed07e635e7126aa`
+- Azure deployment: `c4396748-2ef8-43b8-b7e3-8eeea725db3a`
 
-The complete report is in `.factory/review-3.md`. The remaining fixes are F-3-1 through F-3-3: replace “Practice console · local session,” “Three moves,” and “Kept focused” with plain section names or remove them.
+## What changed
+
+- Replaced the editor eyebrows with **Score editor** and **Sample score editor**.
+- Removed “Three moves” and “Kept focused”; the useful section headings now stand alone.
+- Added `landing sections use plain, task-specific names` to prevent those labels from returning.
+- Updated `.factory/catalog-description.txt` to the 51-character verb-first line: “Write, hear, and loop an ABC score in your browser.”
+- Updated the copy audit and recorded all 21 cumulative finding mappings in `.factory/polish-3.md`.
+
+The cream enamel, walnut frame, ruled paper, teal/coral controls, generated console artwork, and static-web deployment class are unchanged.
 
 ## Verification
 
-Fresh clone `/tmp/abc-score-play-review-3` at `34096d2`:
+Fresh clone `/tmp/abc-score-play-polish-3.sCEX4s` at the repair commit:
 
-- Every one of the 14 exact claim commands in `.factory/claims.json`: PASS independently.
-- `npm test`: PASS — 5 Vitest tests and 22 Chromium tests.
-- `npm run lint` and `npm run build`: PASS; `dist/` produced.
-- Live cold checks at 390 × 844 and 1440 × 900: headline, audience, first action, action result, and facts visible before scrolling; no console/page errors, cross-origin requests, or horizontal overflow.
-- Live demo: realistic eight-bar sample, persistent banner, reset, isolated demo storage, real-score restore, route focus, and offline reload all verified.
-- Live routes and unknown route: correct route metadata, consistent legal chrome, no dead same-origin links, and designed HTTP 404 verified.
+- Every one of the 14 exact `.factory/claims.json` commands passed independently.
+- `npm test`: 5 Vitest tests and 23 Chromium tests passed.
+- `npm run lint`, `npm audit --omit=dev`, and `npm run build`: passed; zero vulnerabilities; `dist/` produced.
+- Browser coverage passed for Web Audio generation, two loop passes, live rendering, isolated demo storage, local file round trips, score links, print media, errors, offline reload, keyboard access, 44×44 targets, mobile layout, focus/history, metadata, legal routes, privacy request logging, and HTTP 404 behavior.
 
-No new missed-leverage or AI finding exists: the brief explicitly makes composition AI a non-goal, and local file open/download plus score links satisfy the implied text-native import/export need.
+Cold production verification after deployment:
 
-## Run
+- `/opt/fleet/lib/verify-url.sh` passed for home and `/?demo=1`: correct title/lang/H1/main, no missing alt text, no unlabeled buttons, and no console errors.
+- Fresh 390×844 contexts found the first-screen action and facts in view with no horizontal overflow. The demo showed the banner, rendered score, **8 bars**, **Play score**, and **Play loop** in its initial viewport.
+- Reset and **Start for real** preserved the real score, removed only demo data, and focused the visible editor. Offline reload retained the eight-bar demo.
+- `/`, `/demo`, `/privacy`, and `/terms` returned 200 with route titles; an unknown route returned the designed 404. Every route had one H1, legal links, and zero serious/critical axe findings.
+- The live functional pass observed Web Audio resume/create/start, rendered a changed tune, opened and downloaded exact ABC bytes, and targeted line 2 for an error.
+- Lighthouse mobile: home **100 performance / 100 accessibility / 100 best practices / 100 SEO**; demo **99/100/100/100**. Home LCP 1.2 s; demo LCP 1.8 s; both CLS 0.
+- Production size: JavaScript 164.07 KB gzip total; CSS 3.98 KB gzip.
+
+Evidence and the finding-by-finding map are in `.factory/polish-3.md` and `.factory/evidence/polish-3/`.
+
+## Run and verify
 
 ```sh
 npm ci
@@ -32,6 +50,6 @@ npm run build
 npm run preview -- --port 4173
 ```
 
-## Known gaps
+## Known gaps and next steps
 
-F-3-1 to F-3-3 in `.factory/review-3.md`. No functional, demo, privacy, claim-test, routing, accessibility, or visual-identity gap was found.
+None in the researched scope or product contract. Continue running the declared claim commands after any storage, playback, routing, service-worker, or visitor-copy change.
