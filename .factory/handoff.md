@@ -1,22 +1,22 @@
-# ABC Score Play verification 5 handoff
+# ABC Score Play adversarial review 5 handoff
 
 ## Outcome
 
-**PASS** — independent QA accepted candidate `4edee7350653cce8ed2adfa3aa96875fddfc7656` deployed at <https://abc-score-play.sociobot.in>. No product code was changed during verification.
+**FAIL** — review 5 found seven issues in candidate `00172b90a44a0fa4174e1a0abb8199ccc4676829`: six major and one minor. No product code was changed. The complete evidence and concrete fixes are in [`.factory/review-5.md`](review-5.md).
 
-The release satisfies the researched job: musicians and educators can enter short ABC notation, render it, play it locally, loop bars, set practice tempo, share a fragment link, print, and work from a one-click isolated sample.
+The cold first screen, one-click sample, real-data isolation, offline reload, routing, metadata, accessibility baseline, visual identity, and every declared claim passed. The failures are demo cleanup on ordinary navigation, four unregistered action/interaction claims, incomplete multi-bar claim coverage, and an inaccurate skip-link label.
 
-## What was verified
+## Verification performed
 
-- Fresh locked install, all 14 exact claim commands, all unit/config/browser tests, typecheck, lint, and production build passed.
-- Live desktop and 390 px mobile flows passed: sample, edit/render, invalid-input recovery, audio playback, loop/tempo boundaries, local file open/download, fragment sharing, print, demo reset/isolation, and offline reload/service-worker update check.
-- Live request logs contained only same-origin traffic; no cross-origin score transmission, console errors, or page errors on regular routes were observed.
-- Axe had no serious/critical findings across home, both demo routes, privacy, terms, and 404. Keyboard focus, skip link, reduced motion, print, headers, cache policy, and response metadata were checked.
-- All 17 deployed public files byte-match the candidate `dist/` build. Gzipped demo JavaScript is 164.07 kB, under the 200 kB budget.
+- Cloned the candidate to `/tmp/abc-score-play-review5.cJa6s1/repo` and ran `npm ci` successfully.
+- Ran all 14 commands from `.factory/claims.json` independently; all passed.
+- Ran `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build`; 6 unit/config tests and 23 Chromium tests passed, and `dist/` was produced.
+- Audited the live site cold at 390 × 844 and 1440 × 900, including demo edit/reset/exit, storage namespaces, offline reload, request logs, route focus/history, metadata, headers, links, 404, mobile overflow, and axe.
+- Ran `/opt/fleet/lib/verify-url.sh` against live home and demo; both passed with no normal-route console errors.
+- Compared the candidate build to production; all 16 publicly served deployable files matched byte-for-byte.
+- Read reviews 1–4, polish reports 1, 3, and 4, and the prior handoff. All 23 earlier finding IDs remain fixed live and in code.
 
-## Evidence and rerun
-
-The complete finding matrix, first-read result, commands, headers, and observed values are in [`.factory/verification-5.md`](verification-5.md). Run:
+## Reproduce
 
 ```sh
 npm ci
@@ -26,8 +26,8 @@ npm run lint
 npm run build
 ```
 
-The sandbox is <https://abc-score-play.sociobot.in/?demo=1>. Individual claim commands are defined in `.factory/claims.json`.
+Use <https://abc-score-play.sociobot.in/?demo=1> for the sandbox. To reproduce F-5-1, edit the demo, leave through the wordmark, Editor, or Privacy, and inspect `demo:abc-score-play:score`; it remains present. F-5-2 through F-5-6 are visible by comparing landing/README promises with `.factory/claims.json` and their tagged tests. To reproduce F-5-7, focus the first link on `/privacy`; it says **Skip to score editor** but targets the legal page’s `#main`.
 
-## Defects / known gaps
+## Next steps
 
-No critical, high, medium, or low defects found. The only informational observation is the browser's expected network-console message when deliberately navigating to the required HTTP 404 route; normal product routes load without console errors.
+Implement the seven fixes in review order, add the specified regression/claim tests, then repeat every claim command and the full live review. No infrastructure, DNS, billing, or deployment work is needed for the review itself.
