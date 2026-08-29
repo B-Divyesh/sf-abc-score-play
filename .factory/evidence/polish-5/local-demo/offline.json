@@ -1,0 +1,7 @@
+{
+  "url": "http://127.0.0.1:4173/demo",
+  "title": "Demo — ABC Score Play",
+  "heading": "Play the sample score",
+  "bars": "8 bars",
+  "serviceWorker": "http://127.0.0.1:4173/sw.js"
+}

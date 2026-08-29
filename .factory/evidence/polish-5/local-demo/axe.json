@@ -1,0 +1,26 @@
+[
+  {
+    "route": "/",
+    "seriousOrCritical": []
+  },
+  {
+    "route": "/?demo=1",
+    "seriousOrCritical": []
+  },
+  {
+    "route": "/demo",
+    "seriousOrCritical": []
+  },
+  {
+    "route": "/privacy",
+    "seriousOrCritical": []
+  },
+  {
+    "route": "/terms",
+    "seriousOrCritical": []
+  },
+  {
+    "route": "/missing-polish-5",
+    "seriousOrCritical": []
+  }
+]

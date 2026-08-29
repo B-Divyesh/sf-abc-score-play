@@ -1,0 +1,121 @@
+[
+  {
+    "file": "404.html",
+    "url": "https://abc-score-play.sociobot.in/missing-polish-5",
+    "status": 404,
+    "bytes": 5422,
+    "match": true
+  },
+  {
+    "file": "apple-touch-icon.png",
+    "url": "https://abc-score-play.sociobot.in/apple-touch-icon.png",
+    "status": 200,
+    "bytes": 3463,
+    "match": true
+  },
+  {
+    "file": "assets/abc-score-play-hero.avif",
+    "url": "https://abc-score-play.sociobot.in/assets/abc-score-play-hero.avif",
+    "status": 200,
+    "bytes": 40771,
+    "match": true
+  },
+  {
+    "file": "assets/abc-score-play-hero.webp",
+    "url": "https://abc-score-play.sociobot.in/assets/abc-score-play-hero.webp",
+    "status": 200,
+    "bytes": 51842,
+    "match": true
+  },
+  {
+    "file": "assets/abc-score-play-social.webp",
+    "url": "https://abc-score-play.sociobot.in/assets/abc-score-play-social.webp",
+    "status": 200,
+    "bytes": 79420,
+    "match": true
+  },
+  {
+    "file": "assets/abcjs-CUoT7yai.js",
+    "url": "https://abc-score-play.sociobot.in/assets/abcjs-CUoT7yai.js",
+    "status": 200,
+    "bytes": 518210,
+    "match": true
+  },
+  {
+    "file": "assets/index-BzKXPIl9.js",
+    "url": "https://abc-score-play.sociobot.in/assets/index-BzKXPIl9.js",
+    "status": 200,
+    "bytes": 464,
+    "match": true
+  },
+  {
+    "file": "assets/main-DQ4qtbCr.js",
+    "url": "https://abc-score-play.sociobot.in/assets/main-DQ4qtbCr.js",
+    "status": 200,
+    "bytes": 25437,
+    "match": true
+  },
+  {
+    "file": "assets/main-DS5DW7ek.css",
+    "url": "https://abc-score-play.sociobot.in/assets/main-DS5DW7ek.css",
+    "status": 200,
+    "bytes": 13788,
+    "match": true
+  },
+  {
+    "file": "demo.html",
+    "url": "https://abc-score-play.sociobot.in/demo",
+    "status": 200,
+    "bytes": 1599,
+    "match": true
+  },
+  {
+    "file": "favicon.svg",
+    "url": "https://abc-score-play.sociobot.in/favicon.svg",
+    "status": 200,
+    "bytes": 498,
+    "match": true
+  },
+  {
+    "file": "index.html",
+    "url": "https://abc-score-play.sociobot.in/",
+    "status": 200,
+    "bytes": 1819,
+    "match": true
+  },
+  {
+    "file": "privacy.html",
+    "url": "https://abc-score-play.sociobot.in/privacy",
+    "status": 200,
+    "bytes": 1638,
+    "match": true
+  },
+  {
+    "file": "robots.txt",
+    "url": "https://abc-score-play.sociobot.in/robots.txt",
+    "status": 200,
+    "bytes": 80,
+    "match": true
+  },
+  {
+    "file": "sitemap.xml",
+    "url": "https://abc-score-play.sociobot.in/sitemap.xml",
+    "status": 200,
+    "bytes": 366,
+    "match": true
+  },
+  {
+    "file": "sw.js",
+    "url": "https://abc-score-play.sociobot.in/sw.js",
+    "status": 200,
+    "bytes": 1178,
+    "match": true
+  },
+  {
+    "file": "terms.html",
+    "url": "https://abc-score-play.sociobot.in/terms",
+    "status": 200,
+    "bytes": 1565,
+    "match": true
+  }
+]

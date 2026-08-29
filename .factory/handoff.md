@@ -1,22 +1,29 @@
-# ABC Score Play adversarial review 5 handoff
+# ABC Score Play perfection-loop 5 handoff
 
 ## Outcome
 
-**FAIL** — review 5 found seven issues in candidate `00172b90a44a0fa4174e1a0abb8199ccc4676829`: six major and one minor. No product code was changed. The complete evidence and concrete fixes are in [`.factory/review-5.md`](review-5.md).
+**PASS.** All findings from adversarial reviews 1–5 are closed in implementation commits `49b2216b` and `53390f4b`. Review 2 had zero findings. The final build is live at <https://abc-score-play.sociobot.in>, and its isolated one-click sample is <https://abc-score-play.sociobot.in/?demo=1>.
 
-The cold first screen, one-click sample, real-data isolation, offline reload, routing, metadata, accessibility baseline, visual identity, and every declared claim passed. The failures are demo cleanup on ordinary navigation, four unregistered action/interaction claims, incomplete multi-bar claim coverage, and an inaccurate skip-link label.
+The repair preserves the mid-century instrument-panel design and static-web artifact class. It adds complete claim coverage for sample loading, clearing, staff selection, and Space playback; discards demo data on every exit; proves a real two-bar audio loop; and gives every route the accurate skip-link label. The loop work also fixed a silent extracted-score bug, and the live audit closed a staff-click console error before the final redeploy.
 
-## Verification performed
+## Exact verification evidence
 
-- Cloned the candidate to `/tmp/abc-score-play-review5.cJa6s1/repo` and ran `npm ci` successfully.
-- Ran all 14 commands from `.factory/claims.json` independently; all passed.
-- Ran `npm test`, `npm run typecheck`, `npm run lint`, and `npm run build`; 6 unit/config tests and 23 Chromium tests passed, and `dist/` was produced.
-- Audited the live site cold at 390 × 844 and 1440 × 900, including demo edit/reset/exit, storage namespaces, offline reload, request logs, route focus/history, metadata, headers, links, 404, mobile overflow, and axe.
-- Ran `/opt/fleet/lib/verify-url.sh` against live home and demo; both passed with no normal-route console errors.
-- Compared the candidate build to production; all 16 publicly served deployable files matched byte-for-byte.
-- Read reviews 1–4, polish reports 1, 3, and 4, and the prior handoff. All 23 earlier finding IDs remain fixed live and in code.
+- Final clean clone: `/tmp/abc-score-play-polish5-final.qC82pF/repo` at `53390f4b`.
+- Locked install: `npm ci` passed.
+- Every one of the 18 exact `.factory/claims.json` commands passed independently: `sample-score`, `free-use`, `local-score`, `demo-isolation`, `offline-reload`, `score-playback`, `bar-loop`, `tempo-range`, `live-render`, `abc-file-open`, `abc-file-download`, `score-link`, `print-card`, `error-lines`, `sample-load`, `clear-editor`, `staff-bar-selection`, and `keyboard-playback`.
+- Full `npm test` passed: 8 Vitest unit/config tests and 26 Chromium integration/browser tests in 31.8 seconds.
+- `npm run typecheck`, `npm run lint`, and `npm run build` passed. `dist/index.html` exists.
+- `npm audit --omit=dev` found zero vulnerabilities.
+- `/opt/fleet/lib/verify-url.sh` passed on live home and demo: correct title, `lang=en`, one H1, main landmark, complete alt text, labeled buttons, and zero console errors.
+- Axe found zero serious or critical issues on `/`, `/?demo=1`, `/demo`, `/privacy`, `/terms`, and the real 404 at 390×844. Dark/reduced-motion coverage remains in the browser suite.
+- Live Lighthouse mobile: home 100 performance / 100 accessibility / 100 best practices / 100 SEO, LCP 1.13 s, TBT 28 ms, CLS 0; demo 99/100/100/100, LCP 1.82 s, TBT 70 ms, CLS 0.00035.
+- Live privacy exercise recorded zero cross-origin requests, zero request bodies, and zero normal-route console errors. Demo exit removed only `demo:abc-score-play:score`.
+- A cold live service-worker visit and offline reload retained the Demo title, eight-bar score, and `/sw.js` controller.
+- All 17 public deployment files match the final `dist/` byte-for-byte. Final Azure deployment: `e85e106f-57f5-443c-9cb9-bde6505cec76`.
 
-## Reproduce
+Evidence is under [`.factory/evidence/polish-5`](evidence/polish-5), including [the live audit](evidence/polish-5/live-audit.json), [deployed-file hashes](evidence/polish-5/deployed-files.json), screenshots, verifier reports, and Lighthouse JSON. The cumulative finding map is [`.factory/polish-5.md`](polish-5.md).
+
+## Run and verify
 
 ```sh
 npm ci
@@ -26,8 +33,12 @@ npm run lint
 npm run build
 ```
 
-Use <https://abc-score-play.sociobot.in/?demo=1> for the sandbox. To reproduce F-5-1, edit the demo, leave through the wordmark, Editor, or Privacy, and inspect `demo:abc-score-play:score`; it remains present. F-5-2 through F-5-6 are visible by comparing landing/README promises with `.factory/claims.json` and their tagged tests. To reproduce F-5-7, focus the first link on `/privacy`; it says **Skip to score editor** but targets the legal page’s `#main`.
+Run any public claim with its exact command from `.factory/claims.json`, for example:
 
-## Next steps
+```sh
+npm test -- --grep @claim:bar-loop
+```
 
-Implement the seven fixes in review order, add the specified regression/claim tests, then repeat every claim command and the full live review. No infrastructure, DNS, billing, or deployment work is needed for the review itself.
+## Known gaps and next steps
+
+None in the researched scope. No infrastructure, DNS, billing, account, API, analytics, or AI work is required.
