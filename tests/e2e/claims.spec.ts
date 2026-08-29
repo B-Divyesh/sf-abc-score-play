@@ -221,6 +221,8 @@ test('@claim:clear-editor Clearing removes only the active score', async ({ page
 });
 
 test('@claim:staff-bar-selection Selecting a staff bar sets that loop', async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto('/?demo=1');
   await expect(page.locator('#paper svg')).toBeVisible();
   await page.locator('#paper .abcjs-note.abcjs-mm2 path').first().click({ force: true });
@@ -228,6 +230,7 @@ test('@claim:staff-bar-selection Selecting a staff bar sets that loop', async ({
   await expect(page.locator('#loop-end')).toHaveValue('3');
   await expect(page.locator('#loop-summary')).toHaveText('Bar 3 will repeat until you stop.');
   await expect(page.locator('#app-status')).toHaveText('Bar 3 selected for looping.');
+  expect(pageErrors).toEqual([]);
 });
 
 test('@claim:tempo-range Practice tempo accepts 40 through 220 BPM and clamps outside values', async ({ page }) => {

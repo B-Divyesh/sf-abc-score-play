@@ -256,7 +256,10 @@ function setupEditor(demo: boolean): () => void {
       const parsed = abc.renderAbc(paper, text, {
         responsive: 'resize', add_classes: true, selectionColor: '#c54f38', paddingtop: 12, paddingbottom: 12,
         clickListener: (_element, _tune, classes, analysis) => {
-          const globalMeasure = `${classes} ${analysis.parentClasses.join(' ')} ${analysis.clickedClasses.join(' ')}`.match(/abcjs-mm(\d+)/)?.[1];
+          const classText = [classes, analysis.parentClasses, analysis.clickedClasses]
+            .map((value) => Array.isArray(value) ? value.join(' ') : String(value ?? ''))
+            .join(' ');
+          const globalMeasure = classText.match(/abcjs-mm(\d+)/)?.[1];
           const selected = Math.min(bars, Math.max(1, Number(globalMeasure ?? analysis.measure) + 1));
           loopStart.value = String(selected); loopEnd.value = String(selected); updateLoopSummary();
           status.textContent = `Bar ${selected} selected for looping.`;
