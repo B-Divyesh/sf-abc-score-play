@@ -1,80 +1,20 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFile } from 'node:fs/promises';
 
-test('@claim:sample-score The demo opens with a rendered sample score', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/?demo=1');
-  await expect(page.locator('#paper svg')).toBeVisible();
-  await expect(page.locator('#validation-label')).toHaveText('Valid score');
-  await expect(page.locator('#bar-count')).toHaveText('8 bars');
-  await expect(page.getByText('Demo — sample data, nothing is saved to your real score', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Reset demo' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Start for real' })).toBeVisible();
-  for (const selector of ['#paper svg', '#bar-count', '#play-score', '#play-loop']) {
-    await expect(page.locator(selector), `${selector} should intersect the first phone viewport`).toBeInViewport();
-  }
-  const sample = await page.locator('#abc-source').inputValue();
-  await page.locator('#paper .abcjs-note.abcjs-mm2 path').first().click({ force: true });
-  await expect(page.locator('#loop-start')).toHaveValue('3');
-  await page.locator('#abc-source').fill('X:1\nT:Changed\nM:4/4\nL:1/4\nK:C\n| C D E F |');
-  await page.getByRole('button', { name: 'Reset demo' }).click();
-  await expect(page.locator('#abc-source')).toHaveValue(sample);
-  await expect(page.locator('#bar-count')).toHaveText('8 bars');
-});
+const SAMPLE_SCORE = `X:1
+T:Evening Scale Study
+C:ABC Score Play sample
+M:4/4
+L:1/8
+Q:1/4=104
+K:G
+|: G2 B2 d2 B2 | A2 c2 e2 c2 |
+G2 A2 B2 c2 | d4 B4 :|
+|: e2 d2 c2 B2 | A2 G2 F2 D2 |
+G2 B2 A2 F2 | G8 :|`;
 
-test('@claim:free-use The product is free and needs no account', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByText('Free to use', { exact: true })).toBeVisible();
-  await expect(page.locator('input[type="password"]')).toHaveCount(0);
-  await expect(page.getByText(/buy|subscribe|sign in/i)).toHaveCount(0);
-});
-
-test('@claim:local-score Score text stays in the browser', async ({ page }) => {
-  const crossOrigin: string[] = [];
-  page.on('request', (request) => {
-    if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url());
-  });
-  await page.goto('/demo');
-  await expect(page.locator('#paper svg')).toBeVisible();
-  await page.locator('#abc-source').fill('X:1\nT:Local\nM:4/4\nL:1/4\nK:C\n| C D E F |');
-  await expect(page.locator('#validation-label')).toHaveText('Valid score');
-  expect(await page.evaluate(() => localStorage.getItem('demo:abc-score-play:score'))).toContain('T:Local');
-  expect(crossOrigin).toEqual([]);
-});
-
-test('@claim:demo-isolation Demo edits never replace the real score', async ({ page }) => {
-  const realScore = 'X:1\nT:REAL-MARKER\nM:4/4\nL:1/4\nK:C\n| C D E F |';
-  const demoScore = 'X:1\nT:DEMO-MARKER\nM:4/4\nL:1/4\nK:C\n| G A B c |';
-  await page.addInitScript(({ real, demo }) => {
-    localStorage.setItem('abc-score-play:score', real);
-    localStorage.setItem('demo:abc-score-play:score', demo);
-  }, { real: realScore, demo: demoScore });
-  await page.goto('/demo');
-  await expect(page.locator('#abc-source')).toHaveValue(demoScore);
-  await page.getByRole('button', { name: 'Start for real' }).click();
-  await expect(page.locator('#abc-source')).toHaveValue(realScore);
-  await expect.poll(() => page.evaluate(() => ({
-    real: localStorage.getItem('abc-score-play:score'),
-    demo: localStorage.getItem('demo:abc-score-play:score')
-  }))).toEqual({ real: realScore, demo: null });
-});
-
-test('@claim:offline-reload The demo reloads offline after one visit', async ({ page, context }) => {
-  await page.goto('/demo');
-  await expect(page.locator('#paper svg')).toBeVisible();
-  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-  await page.reload();
-  await expect(page.locator('#paper svg')).toBeVisible();
-  await context.setOffline(true);
-  await page.reload();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Play the sample score');
-  await expect(page.locator('#paper svg')).toBeVisible();
-});
-
-test('@claim:score-playback A valid score plays with local audio', async ({ page }) => {
-  const pageErrors: string[] = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
+async function installWebAudioProbe(page: Page): Promise<void> {
   await page.addInitScript(() => {
     const calls = { resume: 0, createOscillator: 0, start: 0 };
     Object.defineProperty(window, '__audioCalls', { value: calls });
@@ -101,6 +41,97 @@ test('@claim:score-playback A valid score plays with local audio', async ({ page
     }
     Object.defineProperty(window, 'AudioContext', { value: FakeAudioContext, configurable: true });
   });
+}
+
+test('@claim:sample-score The demo opens with a rendered sample score', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?demo=1');
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await expect(page.locator('#validation-label')).toHaveText('Valid score');
+  await expect(page.locator('#bar-count')).toHaveText('8 bars');
+  await expect(page.getByText('Demo — sample data, nothing is saved to your real score', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Reset demo' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Start for real' })).toBeVisible();
+  for (const selector of ['#paper svg', '#bar-count', '#play-score', '#play-loop']) {
+    await expect(page.locator(selector), `${selector} should intersect the first phone viewport`).toBeInViewport();
+  }
+  const sample = await page.locator('#abc-source').inputValue();
+  await page.locator('#abc-source').fill('X:1\nT:Changed\nM:4/4\nL:1/4\nK:C\n| C D E F |');
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await expect(page.locator('#abc-source')).toHaveValue(sample);
+  expect(sample).toBe(SAMPLE_SCORE);
+  await expect(page.locator('#bar-count')).toHaveText('8 bars');
+});
+
+test('@claim:free-use The product is free and needs no account', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('Free to use', { exact: true })).toBeVisible();
+  await expect(page.locator('input[type="password"]')).toHaveCount(0);
+  await expect(page.getByText(/buy|subscribe|sign in/i)).toHaveCount(0);
+});
+
+test('@claim:local-score Score text stays in the browser', async ({ page }) => {
+  const crossOrigin: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url());
+  });
+  await page.goto('/demo');
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await page.locator('#abc-source').fill('X:1\nT:Local\nM:4/4\nL:1/4\nK:C\n| C D E F |');
+  await expect(page.locator('#validation-label')).toHaveText('Valid score');
+  expect(await page.evaluate(() => localStorage.getItem('demo:abc-score-play:score'))).toContain('T:Local');
+  expect(crossOrigin).toEqual([]);
+});
+
+test('@claim:demo-isolation Demo edits stay separate and are discarded on every exit', async ({ page }) => {
+  const realScore = 'X:1\nT:REAL-MARKER\nM:4/4\nL:1/4\nK:C\n| C D E F |';
+  const exits = [
+    { name: 'ABC Score Play home', url: /\/$/ },
+    { name: 'Editor', url: /\/#workbench$/ },
+    { name: 'Privacy', url: /\/privacy$/ },
+    { name: 'Terms', url: /\/terms$/ }
+  ];
+  await page.goto('/');
+  await page.evaluate((real) => localStorage.setItem('abc-score-play:score', real), realScore);
+
+  for (const [index, exit] of exits.entries()) {
+    const demoScore = `X:1\nT:DEMO EXIT ${index}\nM:4/4\nL:1/4\nK:C\n| G A B c |`;
+    await page.goto('/?demo=1');
+    await page.locator('#abc-source').fill(demoScore);
+    await expect(page.locator('#validation-label')).toHaveText('Valid score');
+    const scope = exit.name === 'Terms' ? page.getByRole('navigation', { name: 'Footer navigation' }) : page.locator('.site-header');
+    await scope.getByRole('link', { name: exit.name }).click();
+    await expect(page).toHaveURL(exit.url);
+    await expect.poll(() => page.evaluate(() => ({
+      real: localStorage.getItem('abc-score-play:score'),
+      demo: localStorage.getItem('demo:abc-score-play:score')
+    }))).toEqual({ real: realScore, demo: null });
+    await page.goto('/?demo=1');
+    await expect(page.locator('#abc-source')).toHaveValue(SAMPLE_SCORE);
+  }
+
+  await page.locator('#abc-source').fill('X:1\nT:START REAL\nM:4/4\nL:1/4\nK:C\n| G A B c |');
+  await page.getByRole('button', { name: 'Start for real' }).click();
+  await expect(page.locator('#abc-source')).toHaveValue(realScore);
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('demo:abc-score-play:score'))).toBeNull();
+});
+
+test('@claim:offline-reload The demo reloads offline after one visit', async ({ page, context }) => {
+  await page.goto('/demo');
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await page.reload();
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Play the sample score');
+  await expect(page.locator('#paper svg')).toBeVisible();
+});
+
+test('@claim:score-playback A valid score plays with local audio', async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await installWebAudioProbe(page);
   await page.goto('/?demo=1');
   await expect(page.locator('#paper svg')).toBeVisible();
   await page.getByRole('button', { name: 'Play score' }).click();
@@ -114,14 +145,89 @@ test('@claim:score-playback A valid score plays with local audio', async ({ page
   expect(pageErrors).toEqual([]);
 });
 
-test('@claim:bar-loop A selected bar repeats twice', async ({ page }) => {
+test('@claim:bar-loop A selected range repeats twice', async ({ page }) => {
+  await installWebAudioProbe(page);
   await page.goto('/demo');
   await expect(page.locator('#paper svg')).toBeVisible();
   await page.locator('#tempo-number').fill('220');
   await page.locator('#tempo-number').press('Enter');
+  await page.locator('#loop-start').fill('2');
+  await page.locator('#loop-start').press('Enter');
+  await page.locator('#loop-end').fill('3');
+  await page.locator('#loop-end').press('Enter');
+  await expect(page.locator('#loop-summary')).toHaveText('Bars 2–3 will repeat until you stop.');
+  await page.evaluate(() => {
+    const observed = new Set<string>();
+    Object.defineProperty(window, '__playedMeasures', { value: observed });
+    new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        const target = mutation.target as Element;
+        if (!target.classList.contains('playing')) continue;
+        for (const name of target.classList) if (/^abcjs-mm\d+$/.test(name)) observed.add(name);
+      }
+    }).observe(document.querySelector('#paper')!, { attributes: true, attributeFilter: ['class'], subtree: true });
+  });
   await page.getByRole('button', { name: 'Play loop' }).click();
-  await expect(page.locator('#app-status')).toContainText('Loop played 2 times', { timeout: 8_000 });
+  await expect.poll(() => page.evaluate(() => [...(window as unknown as { __playedMeasures: Set<string> }).__playedMeasures])).toContain('abcjs-mm1');
+  await expect.poll(() => page.evaluate(() => [...(window as unknown as { __playedMeasures: Set<string> }).__playedMeasures])).toContain('abcjs-mm2');
+  await expect(page.locator('#app-status')).toContainText('Loop played 2 times', { timeout: 10_000 });
+  expect(await page.evaluate(() => (window as unknown as { __audioCalls: { start: number } }).__audioCalls.start)).toBeGreaterThanOrEqual(16);
   await page.getByRole('button', { name: 'Stop' }).click();
+  await expect(page.locator('#app-status')).toHaveText('Playback stopped.');
+});
+
+test('@claim:sample-load Loading the sample replaces and saves the real score', async ({ page }) => {
+  const original = 'X:1\nT:My Draft\nM:4/4\nL:1/4\nK:C\n| C D E F |';
+  await page.goto('/');
+  await page.locator('#abc-source').fill(original);
+  await expect(page.locator('#validation-label')).toHaveText('Valid score');
+  await page.getByRole('button', { name: 'Load sample score' }).click();
+  await expect(page.locator('#abc-source')).toHaveValue(SAMPLE_SCORE);
+  await expect(page.locator('#bar-count')).toHaveText('8 bars');
+  await expect(page.getByRole('button', { name: 'Play score' })).toBeEnabled();
+  expect(await page.evaluate(() => localStorage.getItem('abc-score-play:score'))).toBe(SAMPLE_SCORE);
+});
+
+test('@claim:clear-editor Clearing removes only the active score', async ({ page }) => {
+  const realScore = 'X:1\nT:REAL TO CLEAR\nM:4/4\nL:1/4\nK:C\n| C D E F |';
+  const demoScore = 'X:1\nT:DEMO TO CLEAR\nM:4/4\nL:1/4\nK:C\n| G A B c |';
+  await page.goto('/');
+  await page.evaluate(({ real, demo }) => {
+    localStorage.setItem('abc-score-play:score', real);
+    localStorage.setItem('demo:abc-score-play:score', demo);
+  }, { real: realScore, demo: demoScore });
+  await page.reload();
+  await page.getByRole('button', { name: 'Clear editor' }).click();
+  await expect(page.locator('#abc-source')).toHaveValue('');
+  await expect(page.locator('#validation-label')).toHaveText('Waiting for notes');
+  expect(await page.evaluate(() => ({
+    real: localStorage.getItem('abc-score-play:score'),
+    demo: localStorage.getItem('demo:abc-score-play:score')
+  }))).toEqual({ real: null, demo: demoScore });
+
+  await page.evaluate(({ real, demo }) => {
+    localStorage.setItem('abc-score-play:score', real);
+    localStorage.setItem('demo:abc-score-play:score', demo);
+  }, { real: realScore, demo: demoScore });
+  await page.goto('/demo');
+  await expect(page.locator('#abc-source')).toHaveValue(demoScore);
+  await page.getByRole('button', { name: 'Clear editor' }).click();
+  await expect(page.locator('#abc-source')).toHaveValue('');
+  await expect(page.locator('#validation-label')).toHaveText('Waiting for notes');
+  expect(await page.evaluate(() => ({
+    real: localStorage.getItem('abc-score-play:score'),
+    demo: localStorage.getItem('demo:abc-score-play:score')
+  }))).toEqual({ real: realScore, demo: null });
+});
+
+test('@claim:staff-bar-selection Selecting a staff bar sets that loop', async ({ page }) => {
+  await page.goto('/?demo=1');
+  await expect(page.locator('#paper svg')).toBeVisible();
+  await page.locator('#paper .abcjs-note.abcjs-mm2 path').first().click({ force: true });
+  await expect(page.locator('#loop-start')).toHaveValue('3');
+  await expect(page.locator('#loop-end')).toHaveValue('3');
+  await expect(page.locator('#loop-summary')).toHaveText('Bar 3 will repeat until you stop.');
+  await expect(page.locator('#app-status')).toHaveText('Bar 3 selected for looping.');
 });
 
 test('@claim:tempo-range Practice tempo accepts 40 through 220 BPM and clamps outside values', async ({ page }) => {
@@ -244,6 +350,8 @@ test('every public page has one H1 and no serious accessibility violations', asy
     await page.goto(route);
     await expect(page.locator('main')).toBeVisible();
     await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('.skip-link')).toHaveText('Skip to page content');
+    await expect(page.locator('.skip-link')).toHaveAttribute('href', '#main');
     const results = await new AxeBuilder({ page: page as never }).analyze();
     expect(results.violations.filter((violation) => ['serious', 'critical'].includes(violation.impact ?? '')), route).toEqual([]);
   }
@@ -364,7 +472,10 @@ test('regression: every visible mobile control has a 44 by 44 touch target', asy
   expect(undersized).toEqual([]);
 });
 
-test('keyboard access reaches the skip link and controls playback', async ({ page }) => {
+test('@claim:keyboard-playback Space starts and stops score playback', async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await installWebAudioProbe(page);
   await page.goto('/demo');
   await expect(page.locator('#paper svg')).toBeVisible();
   await page.keyboard.press('Tab');
@@ -372,8 +483,11 @@ test('keyboard access reaches the skip link and controls playback', async ({ pag
   await page.locator('#paper-bay').focus();
   await page.keyboard.press('Space');
   await expect(page.locator('#app-status')).toHaveText('Score playing.');
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __audioCalls: { resume: number } }).__audioCalls.resume)).toBe(1);
+  expect(await page.evaluate(() => (window as unknown as { __audioCalls: { start: number } }).__audioCalls.start)).toBeGreaterThan(0);
   await page.keyboard.press('Space');
   await expect(page.locator('#app-status')).toHaveText('Playback stopped.');
+  expect(pageErrors).toEqual([]);
 });
 
 test('legal and unknown routes have one clear heading', async ({ page }) => {

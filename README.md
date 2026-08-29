@@ -4,7 +4,7 @@ Write a short ABC score, hear it, loop bars, share a link, and print it.
 
 ABC Score Play is for musicians and educators who prefer plain-text notation. It turns standard ABC into sheet music and plays it through your speakers. Practice controls set a tempo and repeat one or more bars.
 
-Try the isolated sample at [`?demo=1`](https://abc-score-play.sociobot.in/?demo=1). Demo edits stay separate and never replace your real score.
+Try the isolated sample at [`?demo=1`](https://abc-score-play.sociobot.in/?demo=1). Demo edits stay separate from your real score and are discarded when you leave.
 
 ## What it does
 

@@ -51,6 +51,7 @@ The headline states the job in seven words. The next sentence names musicians an
 | ABC notation practice tool | 4 | Pass; identifies the format and task |
 | Score editor | 2 | Pass; names the workbench |
 | Sample score editor | 3 | Pass; names the demo workbench |
+| Skip to page content | 4 | Pass; accurately names the shared route destination |
 
 The headings **How to make a practice loop** and **A practice tool, not a score library** stand alone. They have no decorative eyebrow copy.
 
@@ -100,4 +101,6 @@ All controls use verbs and one term per action: **Load sample score**, **Open AB
 | Printed output | score card |
 | Local file | ABC file |
 
-Catalog description: “Write, hear, loop, and print an ABC score in your browser.” It starts with a verb and is 58 characters.
+README demo sentence: “Demo edits stay separate from your real score and are discarded when you leave.” It has 13 words.
+
+Catalog description: “Write, play, loop, share, and print an ABC score in your browser.” It starts with a verb and is 65 characters.

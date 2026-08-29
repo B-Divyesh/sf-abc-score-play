@@ -72,4 +72,18 @@ describe('Azure Static Web Apps routing contract', () => {
     expect(lock.packages[''].engines).toEqual(manifest.engines);
     expect(readme).toContain('npm ci');
   });
+
+  it('maps every registered public claim to exactly one browser test', () => {
+    const claims = JSON.parse(readFileSync(resolve(root, '.factory/claims.json'), 'utf8')) as Array<{
+      id: string;
+      test: string;
+    }>;
+    const browserTests = readFileSync(resolve(root, 'tests/e2e/claims.spec.ts'), 'utf8');
+    const registered = claims.map((claim) => claim.id).sort();
+    const implemented = [...browserTests.matchAll(/@claim:([a-z0-9-]+)/g)].map((match) => match[1]).sort();
+
+    expect(new Set(registered).size).toBe(registered.length);
+    expect(implemented).toEqual(registered);
+    for (const claim of claims) expect(claim.test).toBe(`npm test -- --grep @claim:${claim.id}`);
+  });
 });

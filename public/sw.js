@@ -1,4 +1,4 @@
-const CACHE = 'abc-score-play-v3';
+const CACHE = 'abc-score-play-v4';
 const CORE = ['/', '/?demo=1', '/demo', '/privacy', '/terms', '/favicon.svg', '/assets/abc-score-play-hero.webp'];
 
 self.addEventListener('install', (event) => {

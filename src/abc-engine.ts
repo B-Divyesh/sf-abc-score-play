@@ -59,8 +59,8 @@ export function makeLoopSource(abc: AbcModule, source: string, start: number, en
   if (!tune) return source;
   const first = Math.max(0, start - 1);
   const last = Math.min(tune.measures.length, end);
-  const body = tune.measures.slice(first, last).map((measure) => measure.abc).join('');
-  return `${tune.header}\n${body}`;
+  const body = tune.measures.slice(first, last).map((measure) => measure.abc).join('').trimStart();
+  return `${tune.header.trimEnd()}\n${body}`;
 }
 
 export function countBars(abc: AbcModule, source: string): number {

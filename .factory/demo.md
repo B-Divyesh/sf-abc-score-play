@@ -15,7 +15,7 @@ The demo bundles “Evening Scale Study,” an original eight-bar tune in G majo
 
 Demo edits use `localStorage` key `demo:abc-score-play:score`. Real edits use `abc-score-play:score`. The demo never reads or writes the real key.
 
-Use **Reset demo** in the persistent banner to restore the bundled score. Use **Start for real** to remove demo data and return to the real editor. The sample remains bundled in the service worker cache for offline testing.
+Use **Reset demo** in the persistent banner to restore the bundled score. Leaving through Home, Editor, Privacy, Terms, or **Start for real** removes demo data. Returning to the demo starts again with the bundled score. The sample remains bundled in the service worker cache for offline testing.
 
 ## Verification path
 

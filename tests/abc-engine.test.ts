@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decodeScore, encodeScore, sourceLineFromChar, validateSource } from '../src/abc-engine';
+import { decodeScore, encodeScore, makeLoopSource, sourceLineFromChar, validateSource, type AbcModule } from '../src/abc-engine';
 
 const score = `X:1
 T:Test tune
@@ -23,5 +23,18 @@ describe('ABC source helpers', () => {
 
   it('maps character positions to line numbers', () => {
     expect(sourceLineFromChar(score, score.indexOf('K:C'))).toBe(5);
+  });
+
+  it('joins loop measures directly after the header so they remain playable', () => {
+    const abc = {
+      extractMeasures: () => [{
+        header: 'X:1\nT:Loop\nM:4/4\nL:1/4\nK:C\n',
+        measures: [{ abc: '| C D E F |' }, { abc: ' G A B c |' }, { abc: ' c B A G |' }]
+      }]
+    } as unknown as AbcModule;
+    const loop = makeLoopSource(abc, score, 2, 3);
+
+    expect(loop).toBe('X:1\nT:Loop\nM:4/4\nL:1/4\nK:C\nG A B c | c B A G |');
+    expect(loop).not.toContain('K:C\n\n');
   });
 });

@@ -15,18 +15,20 @@ G2 B2 A2 F2 | G8 :|`;
 
 const STORAGE_REAL = 'abc-score-play:score';
 const STORAGE_DEMO = 'demo:abc-score-play:score';
+const DEMO_SESSION = 'abc-score-play:demo-active';
 const BUILD_ID = 'v1.0.0';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 let routeCleanup: (() => void) | undefined;
+let activeRouteIsDemo = false;
 
 function header(): string {
-  return `<a class="skip-link" href="#main">Skip to score editor</a>
+  return `<a class="skip-link" href="#main">Skip to page content</a>
     <header class="site-header">
       <a class="wordmark" href="/" data-route aria-label="ABC Score Play home"><span class="wordmark-mark" aria-hidden="true">ABC</span><span>Score Play</span></a>
       <nav class="site-nav" aria-label="Main navigation">
         <a href="/demo" data-route>Demo</a>
-        <a href="/#workbench">Editor</a>
+        <a href="/#workbench" data-route>Editor</a>
         <a href="/privacy" data-route>Privacy</a>
       </nav>
     </header>`;
@@ -435,6 +437,13 @@ function renderRoute(focus = false): void {
   routeCleanup?.(); routeCleanup = undefined;
   const path = location.pathname.replace(/\/+$/, '') || '/';
   const demo = path === '/demo' || (path === '/' && new URLSearchParams(location.search).get('demo') === '1');
+  if (demo) {
+    sessionStorage.setItem(DEMO_SESSION, '1');
+  } else if (activeRouteIsDemo || sessionStorage.getItem(DEMO_SESSION) === '1') {
+    localStorage.removeItem(STORAGE_DEMO);
+    sessionStorage.removeItem(DEMO_SESSION);
+  }
+  activeRouteIsDemo = demo;
   if (demo) {
     const metadataPath = path === '/demo' ? '/demo' : '/?demo=1';
     setMetadata('Demo — ABC Score Play', 'Play, edit, and loop a ready-made ABC score.', metadataPath);

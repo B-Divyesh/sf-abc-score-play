@@ -1,1 +1,1 @@
-Write, hear, loop, and print an ABC score in your browser.
+Write, play, loop, share, and print an ABC score in your browser.
