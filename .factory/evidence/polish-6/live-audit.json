@@ -1,0 +1,82 @@
+{
+  "checkedAt": "2026-08-29T13:09:02.989Z",
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "ABC Score Play — write, hear, and loop music",
+      "canonical": "https://abc-score-play.sociobot.in/",
+      "raw": "pass"
+    },
+    {
+      "path": "/demo",
+      "status": 200,
+      "title": "Demo — ABC Score Play",
+      "canonical": "https://abc-score-play.sociobot.in/demo",
+      "raw": "pass"
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "title": "Privacy — ABC Score Play",
+      "canonical": "https://abc-score-play.sociobot.in/privacy",
+      "raw": "pass"
+    },
+    {
+      "path": "/terms",
+      "status": 200,
+      "title": "Terms — ABC Score Play",
+      "canonical": "https://abc-score-play.sociobot.in/terms",
+      "raw": "pass"
+    },
+    {
+      "path": "/missing-polish-6",
+      "status": 404,
+      "title": "Page not found — ABC Score Play",
+      "canonical": "https://abc-score-play.sociobot.in/404.html",
+      "raw": "pass"
+    }
+  ],
+  "firstScreen": {
+    "headline": "Write, hear, and loop an ABC score",
+    "audience": "For musicians and educators who need a short score ready to practice or share.",
+    "action": "Try it with sample data",
+    "facts": [
+      "Free to use",
+      "Your score stays in this browser",
+      "Works offline after the first visit"
+    ],
+    "phoneViewport": "pass"
+  },
+  "findings": {
+    "sample-score": "pass",
+    "F-1-1": "pass",
+    "F-5-4": "pass",
+    "F-5-5": "pass",
+    "F-1-3": "pass",
+    "F-5-6": {
+      "status": "pass",
+      "measures": [
+        2,
+        3
+      ],
+      "oscillatorStarts": 24
+    },
+    "F-1-15": "pass",
+    "F-5-1": "pass",
+    "F-1-2": "pass",
+    "F-5-2": "pass",
+    "F-5-3": "pass",
+    "F-5-7": "pass"
+  },
+  "privacy": {
+    "crossOrigin": [],
+    "requestBodies": [],
+    "consoleErrors": []
+  },
+  "offline": {
+    "title": "Demo — ABC Score Play",
+    "bars": "8 bars",
+    "serviceWorker": "https://abc-score-play.sociobot.in/sw.js"
+  }
+}

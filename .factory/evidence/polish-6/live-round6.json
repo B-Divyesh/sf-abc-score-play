@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-08-29T13:10:00Z",
+  "url": "https://abc-score-play.sociobot.in",
+  "findings": {
+    "F-6-1": "The empty-editor placeholder names tune number, title, meter, note length, and key. Missing-field errors use the same plain terms.",
+    "F-6-2": "After the initial page load, a score edit and both accepted and rejected ABC-file selections created no requests.",
+    "F-6-3": "A 1,000,000-byte ABC file rendered as valid; a 1,000,001-byte file was rejected with its recovery message.",
+    "F-6-4": "After localStorage.clear(), a reload showed an empty editor and neither real nor demo score key."
+  }
+}
