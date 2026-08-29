@@ -1,3 +1,41 @@
+# Independent verification 6 handoff
+
+## Outcome
+
+**PASS — release approved.** Independent QA tested commit
+`b3f33c9636f6798dac87dcca5c0b91af9fd58eb2` against
+<https://abc-score-play.sociobot.in> on 2026-08-29 UTC. The production deployment
+matches the candidate build for all 17 publicly shipped files, and no defects
+were found by severity.
+
+## What was independently verified
+
+- Clean `npm ci`; every one of the 18 exact `.factory/claims.json` test commands;
+  aggregate `npm test` (8 unit/config + 26 Chromium tests); typecheck; lint; and
+  production build all passed.
+- Cold first-read satisfies the plain-words contract and exposes the one-click
+  “Try it with sample data” path. Desktop and 390px mobile end-to-end checks
+  covered playback/stop, invalid-input line recovery, demo reset, keyboard
+  focus, service-worker update state, and offline demo reload.
+- Live request logging found same-origin requests only, with no console/page
+  errors. Headers, CSP, cache policy, routes, static bundle sizes, axe, and the
+  supplied `verify-url.sh` checks passed.
+
+Run the verification locally with:
+
+```sh
+npm ci
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
+
+See [verification-6.md](verification-6.md) for the exact evidence, claim list,
+response/header checks, and the non-product Lighthouse CLI limitation.
+
+---
+
 # ABC Score Play perfection-loop 5 handoff
 
 ## Outcome
