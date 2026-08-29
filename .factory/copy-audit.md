@@ -78,6 +78,14 @@ The headings **How to make a practice loop** and **A practice tool, not a score 
 
 All controls use verbs and one term per action: **Load sample score**, **Open ABC file**, **Download ABC file**, **Copy score link**, **Print score card**, **Clear editor**, **Play score**, **Stop**, and **Play loop**.
 
+## 404 recovery copy
+
+| Copy | Words | Result |
+| --- | ---: | --- |
+| Page not found | 3 | Pass; states the error directly |
+| This address does not lead to a page in ABC Score Play. | 11 | Pass; explains what happened |
+| Return to the editor | 4 | Pass; names the recovery action |
+
 ## Terminology
 
 | Concept | One term used |
