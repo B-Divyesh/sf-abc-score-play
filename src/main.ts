@@ -70,7 +70,7 @@ function editorMarkup(demo: boolean): string {
           <label class="visually-hidden" for="abc-source">ABC score text</label>
           <div class="editor-wrap">
             <div class="line-gutter" id="line-gutter" aria-hidden="true">1</div>
-            <textarea id="abc-source" spellcheck="false" autocapitalize="off" aria-describedby="editor-help validation-errors" placeholder="Start with X:, T:, M:, L:, and K: headers."></textarea>
+            <textarea id="abc-source" spellcheck="false" autocapitalize="off" aria-describedby="editor-help file-help validation-errors" placeholder="Start with X: tune number, T: title, M: meter, L: note length, and K: key."></textarea>
           </div>
           <p id="editor-help" class="score-help">Tip: write a bar with notes such as <code>| C2 D2 E2 F2 |</code>.</p>
           <div id="validation-errors" aria-live="polite"></div>
@@ -83,6 +83,7 @@ function editorMarkup(demo: boolean): string {
             <button class="button small" id="print-score" type="button" disabled>Print score card</button>
             <button class="button small" id="clear-score" type="button">Clear editor</button>
           </div>
+          <p class="score-help" id="file-help">Open ABC files up to 1 MB.</p>
         </section>
         <section class="score-panel" aria-labelledby="score-title">
           <div class="panel-head"><div class="panel-title"><${demo ? 'h2' : 'h3'} id="score-title">Rendered score</${demo ? 'h2' : 'h3'}></div><span id="bar-count">0 bars</span></div>
@@ -161,7 +162,7 @@ function legalPage(kind: 'privacy' | 'terms'): string {
   const title = privacy ? 'Keep your score on this device' : 'Use the tool for scores you may share';
   return `${header()}<main id="main" tabindex="-1"><article class="legal-page">
     <p class="eyebrow">${privacy ? 'Privacy' : 'Terms'}</p><h1>${title}</h1>
-    ${privacy ? `<h2>What this tool stores</h2><p>The app stores your current ABC text in this browser. Demo edits stay separate from your real score.</p><h2>What leaves this device</h2><p>Your score is not sent to us. Shared score text appears after <code>#score=</code>. Browsers do not send that part to servers.</p><h2>Control your score</h2><p>Use “Clear editor” to remove saved text. Clearing browser storage also removes it.</p><h2>Contact</h2><p>Email <a href="mailto:privacy@sociobot.in">privacy@sociobot.in</a> with a privacy question.</p>` : `<h2>Your scores</h2><p>Only enter music you wrote or have permission to use. You remain responsible for links and printed copies you share.</p><h2>The service</h2><p>ABC Score Play is provided free of charge and without a warranty. The tool may change or stop.</p><h2>Acceptable use</h2><p>Do not use the service to break laws, distribute harmful material, or infringe another person’s rights.</p><h2>Contact</h2><p>Email <a href="mailto:hello@sociobot.in">hello@sociobot.in</a> with a terms question.</p>`}
+    ${privacy ? `<h2>What this tool stores</h2><p>The app stores your current ABC text in this browser. Demo edits stay separate from your real score.</p><h2>What leaves this device</h2><p>Your score is not sent to us. Shared score text appears after <code>#score=</code>. Browsers do not send that part to servers.</p><h2>Control your score</h2><p>Use “Clear editor” to remove saved text. Clearing this site’s browser storage also removes saved scores.</p><h2>Contact</h2><p>Email <a href="mailto:privacy@sociobot.in">privacy@sociobot.in</a> with a privacy question.</p>` : `<h2>Your scores</h2><p>Only enter music you wrote or have permission to use. You remain responsible for links and printed copies you share.</p><h2>The service</h2><p>ABC Score Play is provided free of charge and without a warranty. The tool may change or stop.</p><h2>Acceptable use</h2><p>Do not use the service to break laws, distribute harmful material, or infringe another person’s rights.</p><h2>Contact</h2><p>Email <a href="mailto:hello@sociobot.in">hello@sociobot.in</a> with a terms question.</p>`}
     <p><a href="/" data-route>Return to the score editor</a></p>
   </article></main>${footer()}`;
 }
@@ -288,7 +289,7 @@ function setupEditor(demo: boolean): () => void {
       updateLoopSummary();
     } catch (error) {
       visual = undefined; lamp.className = 'status-lamp error'; validation.textContent = 'Could not draw score';
-      errors.innerHTML = `<div class="error-list"><strong>The score could not be drawn.</strong> Check the headers and bar lines, then try again.</div>`;
+      errors.innerHTML = `<div class="error-list"><strong>The score could not be drawn.</strong> Check the tune details and bar lines, then try again.</div>`;
       status.textContent = error instanceof Error ? error.message : 'The score could not be drawn.';
       [play, loop, share, print].forEach((button) => { button.disabled = true; });
     }

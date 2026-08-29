@@ -11,7 +11,7 @@ Try the isolated sample at [`?demo=1`](https://abc-score-play.sociobot.in/?demo=
 - Draws the score with the open-source [`abcjs`](https://github.com/paulrosen/abcjs) library.
 - Plays valid scores through your browser.
 - Repeats selected bars at 40–220 beats per minute.
-- Opens `.abc` files without uploading them.
+- Opens `.abc` files up to 1 MB without uploading them.
 - Downloads the exact ABC text as an `.abc` file.
 - Copies a score link that restores the same score when opened.
 - Prints the notation without editor controls.

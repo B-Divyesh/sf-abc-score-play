@@ -14,6 +14,36 @@ G2 A2 B2 c2 | d4 B4 :|
 |: e2 d2 c2 B2 | A2 G2 F2 D2 |
 G2 B2 A2 F2 | G8 :|`;
 
+interface ObservedRequest {
+  url: string;
+  method: string;
+  body: string | null;
+}
+
+function trackScoreRequests(page: Page) {
+  const origin = 'http://127.0.0.1:4173';
+  const requests: ObservedRequest[] = [];
+  const requestsAfterInteraction: ObservedRequest[] = [];
+  let observeInteraction = false;
+
+  page.on('request', (request) => {
+    const observed = { url: request.url(), method: request.method(), body: request.postData() };
+    requests.push(observed);
+    if (observeInteraction) requestsAfterInteraction.push(observed);
+  });
+
+  return {
+    beginInteractionAudit: () => { observeInteraction = true; },
+    crossOriginRequests: () => requests.filter((request) => new URL(request.url).origin !== origin),
+    requestsAfterInteraction
+  };
+}
+
+function sizedAbcFixture(bytes: number): string {
+  const source = 'X:1\nT:One Megabyte Study\nM:4/4\nL:1/4\nK:C\n| C D E F |\n%';
+  return `${source}${'x'.repeat(bytes - Buffer.byteLength(source))}`;
+}
+
 async function installWebAudioProbe(page: Page): Promise<void> {
   await page.addInitScript(() => {
     const calls = { resume: 0, createOscillator: 0, start: 0 };
@@ -71,16 +101,16 @@ test('@claim:free-use The product is free and needs no account', async ({ page }
 });
 
 test('@claim:local-score Score text stays in the browser', async ({ page }) => {
-  const crossOrigin: string[] = [];
-  page.on('request', (request) => {
-    if (new URL(request.url()).origin !== 'http://127.0.0.1:4173') crossOrigin.push(request.url());
-  });
+  const audit = trackScoreRequests(page);
   await page.goto('/demo');
   await expect(page.locator('#paper svg')).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  audit.beginInteractionAudit();
   await page.locator('#abc-source').fill('X:1\nT:Local\nM:4/4\nL:1/4\nK:C\n| C D E F |');
   await expect(page.locator('#validation-label')).toHaveText('Valid score');
   expect(await page.evaluate(() => localStorage.getItem('demo:abc-score-play:score'))).toContain('T:Local');
-  expect(crossOrigin).toEqual([]);
+  expect(audit.crossOriginRequests()).toEqual([]);
+  expect(audit.requestsAfterInteraction).toEqual([]);
 });
 
 test('@claim:demo-isolation Demo edits stay separate and are discarded on every exit', async ({ page }) => {
@@ -220,6 +250,25 @@ test('@claim:clear-editor Clearing removes only the active score', async ({ page
   }))).toEqual({ real: realScore, demo: null });
 });
 
+test('@claim:browser-storage-clear Clearing this site storage removes saved scores', async ({ page }) => {
+  const realScore = 'X:1\nT:STORAGE CLEAR REAL\nM:4/4\nL:1/4\nK:C\n| C D E F |';
+  const demoScore = 'X:1\nT:STORAGE CLEAR DEMO\nM:4/4\nL:1/4\nK:C\n| G A B c |';
+  await page.goto('/');
+  await page.locator('#abc-source').fill(realScore);
+  await expect(page.locator('#validation-label')).toHaveText('Valid score');
+  await page.evaluate((demo) => localStorage.setItem('demo:abc-score-play:score', demo), demoScore);
+  await page.goto('/privacy');
+  await expect(page.getByText('Clearing this site’s browser storage also removes saved scores.')).toBeVisible();
+  await page.evaluate(() => localStorage.clear());
+  await page.goto('/');
+  await expect(page.locator('#abc-source')).toHaveValue('');
+  await expect(page.locator('#validation-label')).toHaveText('Waiting for notes');
+  expect(await page.evaluate(() => ({
+    real: localStorage.getItem('abc-score-play:score'),
+    demo: localStorage.getItem('demo:abc-score-play:score')
+  }))).toEqual({ real: null, demo: null });
+});
+
 test('@claim:staff-bar-selection Selecting a staff bar sets that loop', async ({ page }) => {
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
@@ -262,18 +311,25 @@ test('@claim:live-render Editing valid ABC updates the rendered staff', async ({
   expect(await page.locator('#paper svg').innerHTML()).not.toBe(before);
 });
 
-test('@claim:abc-file-open Opening an ABC file updates the source and staff without uploading', async ({ page }) => {
-  const requests: string[] = [];
-  page.on('request', (request) => requests.push(request.url()));
-  const fixture = 'X:1\nT:File Round Trip\nM:2/4\nL:1/8\nK:D\n| D2 F2 | A4 |';
+test('@claim:abc-file-open Opening an ABC file up to 1 MB updates the source and staff without uploading', async ({ page }) => {
+  const audit = trackScoreRequests(page);
+  const fixture = sizedAbcFixture(1_000_000);
+  const rejectedFixture = Buffer.alloc(1_000_001, 'x');
   await page.goto('/?demo=1');
+  await expect(page.locator('#file-help')).toHaveText('Open ABC files up to 1 MB.');
+  await page.waitForLoadState('networkidle');
+  audit.beginInteractionAudit();
   await page.locator('#open-score-file').setInputFiles({ name: 'lesson.abc', mimeType: 'text/vnd.abc', buffer: Buffer.from(fixture) });
-  await expect(page.locator('#abc-source')).toHaveValue(fixture);
+  await expect.poll(() => page.locator('#abc-source').evaluate((node) => (node as HTMLTextAreaElement).value.length)).toBe(1_000_000);
   await expect(page.locator('#validation-label')).toHaveText('Valid score');
-  await expect(page.locator('#paper')).toContainText('File Round Trip');
-  expect(await page.evaluate(() => localStorage.getItem('demo:abc-score-play:score'))).toBe(fixture);
+  await expect(page.locator('#paper')).toContainText('One Megabyte Study');
+  expect(await page.evaluate(() => localStorage.getItem('demo:abc-score-play:score'))).toHaveLength(1_000_000);
   expect(await page.evaluate(() => localStorage.getItem('abc-score-play:score'))).toBeNull();
-  expect(requests.filter((url) => new URL(url).origin !== 'http://127.0.0.1:4173')).toEqual([]);
+  await page.locator('#open-score-file').setInputFiles({ name: 'too-large.abc', mimeType: 'text/vnd.abc', buffer: rejectedFixture });
+  await expect(page.locator('#app-status')).toHaveText('That file is over 1 MB. Choose a smaller ABC file.');
+  await expect.poll(() => page.locator('#abc-source').evaluate((node) => (node as HTMLTextAreaElement).value.length)).toBe(1_000_000);
+  expect(audit.crossOriginRequests()).toEqual([]);
+  expect(audit.requestsAfterInteraction).toEqual([]);
 });
 
 test('@claim:abc-file-download Downloading preserves exact ABC text and uses a safe filename', async ({ page }) => {
@@ -370,6 +426,18 @@ test('landing sections use plain, task-specific names', async ({ page }) => {
   await page.goto('/?demo=1');
   await expect(page.locator('#workbench .eyebrow')).toHaveText('Sample score editor');
   await expect(page.getByText(/Demo practice console|Practice console|local session/)).toHaveCount(0);
+});
+
+test('editor guidance explains ABC fields without header jargon', async ({ page }) => {
+  await page.goto('/');
+  const source = page.locator('#abc-source');
+  const placeholder = await source.getAttribute('placeholder');
+  const editorGuidance = [placeholder, await page.locator('#editor-help').textContent(), await page.locator('#file-help').textContent()].join(' ');
+  expect(placeholder).toBe('Start with X: tune number, T: title, M: meter, L: note length, and K: key.');
+  expect(editorGuidance).not.toMatch(/\bheaders?\b/i);
+  await source.fill('X:1\nT:Missing fields\nK:C\n| C D E F |');
+  await expect(page.locator('#validation-errors')).toContainText('meter line (M:)');
+  await expect(page.locator('#validation-errors')).not.toContainText(/\bheaders?\b/i);
 });
 
 test('route titles, social metadata, raw heads, and consistent navigation are complete', async ({ page, request }) => {

@@ -25,16 +25,22 @@ export function validateSource(source: string): ScoreIssue[] {
 
   const lines = source.split('\n');
   const issues: ScoreIssue[] = [];
-  const required = ['X:', 'T:', 'M:', 'L:', 'K:'];
-  for (const field of required) {
+  const required = [
+    ['X:', 'tune number'],
+    ['T:', 'title'],
+    ['M:', 'meter'],
+    ['L:', 'note length'],
+    ['K:', 'key']
+  ] as const;
+  for (const [field, name] of required) {
     if (!lines.some((line) => line.trimStart().startsWith(field))) {
-      issues.push({ line: 1, message: `Add a ${field.slice(0, 1)} header before the music.` });
+      issues.push({ line: 1, message: `Add the ${name} line (${field}) before the music.` });
     }
   }
 
   const keyLine = lines.findIndex((line) => line.trimStart().startsWith('K:'));
   if (keyLine >= 0 && !lines.slice(keyLine + 1).some((line) => /[A-Ga-gzZ]/.test(line.replace(/%.*/, '')))) {
-    issues.push({ line: Math.min(keyLine + 2, lines.length), message: 'Add notes or rests after the K header.' });
+    issues.push({ line: Math.min(keyLine + 2, lines.length), message: 'Add notes or rests after the key line.' });
   }
 
   lines.forEach((line, index) => {

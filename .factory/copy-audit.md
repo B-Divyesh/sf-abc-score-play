@@ -23,8 +23,9 @@ The headline states the job in seven words. The next sentence names musicians an
 | Turn text into a practice loop | 6 | Pass |
 | Write ABC on the left. | 5 | Pass |
 | The staff updates as you type. | 6 | Pass |
-| Start with X:, T:, M:, L:, and K: headers. | 8 | Pass |
+| Start with X: tune number, T: title, M: meter, L: note length, and K: key. | 15 | Pass; names every required field without “headers” jargon |
 | Tip: write a bar with notes such as C2 D2 E2 F2. | 12 | Pass |
+| Open ABC files up to 1 MB. | 7 | Pass; `abc-file-open` |
 | Your staff will appear here. | 5 | Pass |
 | Write ABC or load the sample score. | 7 | Pass |
 | Choose a valid score to set a loop. | 8 | Pass |
@@ -74,6 +75,7 @@ The headings **How to make a practice loop** and **A practice tool, not a score 
 | The score link is in the address bar. | 8 | Pass |
 | Copy it there. | 3 | Pass |
 | Bar 1 will repeat until you stop. | 7 | Pass |
+| Clearing this site’s browser storage also removes saved scores. | 9 | Pass; `browser-storage-clear` |
 
 ## Control labels
 

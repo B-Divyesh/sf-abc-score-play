@@ -11,6 +11,8 @@ The catalog can use `?demo=1` directly. `/demo` remains an equivalent shareable 
 
 The demo bundles “Evening Scale Study,” an original eight-bar tune in G major. It includes repeats, a 4/4 meter, and a practice tempo of 104 beats per minute. The first phone screen shows its rendered staff, bar count, and playback controls. Its populated ABC editor follows in the same workbench.
 
+The local **Open ABC file** action accepts `.abc` files up to 1 MB. It reads the selected file only in the active browser mode and does not upload it.
+
 ## Isolation and reset
 
 Demo edits use `localStorage` key `demo:abc-score-play:score`. Real edits use `abc-score-play:score`. The demo never reads or writes the real key.

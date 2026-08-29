@@ -15,9 +15,11 @@ describe('ABC source helpers', () => {
     expect(encodeScore(source)).not.toMatch(/[+/=]/);
   });
 
-  it('reports missing headers and unmatched notation', () => {
+  it('reports missing ABC fields and unmatched notation in plain language', () => {
     const issues = validateSource('X:1\nT:Open "chord\nK:C\nC D E F');
-    expect(issues.map((issue) => issue.message).join(' ')).toContain('M header');
+    const messages = issues.map((issue) => issue.message).join(' ');
+    expect(messages).toContain('meter line (M:)');
+    expect(messages).not.toMatch(/\bheaders?\b/i);
     expect(issues.map((issue) => issue.line)).toContain(2);
   });
 
