@@ -1,6 +1,6 @@
 # Landing page copy audit
 
-Audited 2026-08-28. Counts treat hyphenated terms and ABC snippets as one word. No sentence exceeds 22 words. No sentence uses a banned marketing word.
+Audited 2026-08-29. Counts treat hyphenated terms and ABC snippets as one word. No sentence exceeds 22 words. No sentence uses a banned marketing word.
 
 ## First screen
 
@@ -44,6 +44,16 @@ The headline states the job in seven words. The next sentence names musicians an
 | Your browser stores the current ABC text. | 7 | Pass |
 | Write a short ABC score, hear it, and practice a loop. | 11 | Pass |
 
+## Section labels
+
+| Copy | Words | Result |
+| --- | ---: | --- |
+| ABC notation practice tool | 4 | Pass; identifies the format and task |
+| Score editor | 2 | Pass; names the workbench |
+| Sample score editor | 3 | Pass; names the demo workbench |
+
+The headings **How to make a practice loop** and **A practice tool, not a score library** stand alone. They have no decorative eyebrow copy.
+
 ## Demo and state copy
 
 | Copy | Words | Result |
@@ -82,4 +92,4 @@ All controls use verbs and one term per action: **Load sample score**, **Open AB
 | Printed output | score card |
 | Local file | ABC file |
 
-Catalog description: “Write an ABC score, hear it, loop bars, open files, and print it.” It starts with a verb and is 64 characters.
+Catalog description: “Write, hear, and loop an ABC score in your browser.” It starts with a verb and is 51 characters.

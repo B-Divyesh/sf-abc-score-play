@@ -249,6 +249,18 @@ test('every public page has one H1 and no serious accessibility violations', asy
   }
 });
 
+test('landing sections use plain, task-specific names', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#workbench .eyebrow')).toHaveText('Score editor');
+  await expect(page.getByRole('heading', { name: 'How to make a practice loop' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'A practice tool, not a score library' })).toBeVisible();
+  await expect(page.getByText(/Practice console|local session|Three moves|Kept focused/)).toHaveCount(0);
+
+  await page.goto('/?demo=1');
+  await expect(page.locator('#workbench .eyebrow')).toHaveText('Sample score editor');
+  await expect(page.getByText(/Demo practice console|Practice console|local session/)).toHaveCount(0);
+});
+
 test('route titles, social metadata, raw heads, and consistent navigation are complete', async ({ page, request }) => {
   const routes = [
     { path: '/', title: 'ABC Score Play — write, hear, and loop music', canonical: 'https://abc-score-play.sociobot.in/' },

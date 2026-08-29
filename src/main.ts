@@ -56,7 +56,7 @@ function setMetadata(title: string, description: string, path: string): void {
 function editorMarkup(demo: boolean): string {
   return `<section class="work-section${demo ? ' demo-work-section' : ''}" id="workbench" aria-labelledby="workbench-title">
       <div class="section-heading">
-        <p class="eyebrow">${demo ? 'Demo practice console' : 'Practice console · local session'}</p>
+        <p class="eyebrow">${demo ? 'Sample score editor' : 'Score editor'}</p>
         ${demo ? '<h1 id="workbench-title" tabindex="-1">Play the sample score</h1><p>Evening Scale Study is loaded and ready to play.</p>' : '<h2 id="workbench-title" tabindex="-1">Turn text into a practice loop</h2><p>Write ABC on the left. The staff updates as you type.</p>'}
       </div>
       <div class="workbench">
@@ -133,7 +133,7 @@ function homePage(): string {
     </section>
     ${editorMarkup(false)}
     <section class="how" aria-labelledby="how-title">
-      <p class="eyebrow">Three moves</p><h2 id="how-title">How to make a practice loop</h2>
+      <h2 id="how-title">How to make a practice loop</h2>
       <div class="how-grid">
         <article class="step"><span class="step-number">01</span><h3>Write the tune</h3><p>Type the title, meter, note length, key, and notes. Errors point to a line.</p></article>
         <article class="step"><span class="step-number">02</span><h3>Choose the bars</h3><p>Set the first and last bar. Change the tempo for practice.</p></article>
@@ -141,7 +141,7 @@ function homePage(): string {
       </div>
     </section>
     <section class="boundaries" aria-labelledby="boundaries-title">
-      <div><p class="eyebrow">Kept focused</p><h2 id="boundaries-title">A practice tool, not a score library</h2></div>
+      <div><h2 id="boundaries-title">A practice tool, not a score library</h2></div>
       <div><ul class="boundary-list"><li>No account or cloud score storage.</li><li>No copyrighted score catalogue.</li><li>No composing bot or group editing.</li><li>Your browser stores the current ABC text.</li></ul></div>
     </section>
   </main>${footer()}`;
