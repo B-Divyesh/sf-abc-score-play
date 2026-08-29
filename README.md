@@ -25,7 +25,7 @@ No account is required. The product is free. It does not include a score catalog
 Requires Node.js 20 or newer.
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 

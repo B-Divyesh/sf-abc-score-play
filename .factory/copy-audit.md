@@ -92,4 +92,4 @@ All controls use verbs and one term per action: **Load sample score**, **Open AB
 | Printed output | score card |
 | Local file | ABC file |
 
-Catalog description: “Write, hear, and loop an ABC score in your browser.” It starts with a verb and is 51 characters.
+Catalog description: “Write, hear, loop, and print an ABC score in your browser.” It starts with a verb and is 58 characters.

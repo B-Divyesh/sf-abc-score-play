@@ -165,7 +165,7 @@ function legalPage(kind: 'privacy' | 'terms'): string {
 }
 
 function notFoundPage(): string {
-  return `${header()}<main id="main" tabindex="-1"><section class="not-found"><p class="not-found-code">404</p><h1>This bar is not in the score</h1><p>The page address does not match a part of ABC Score Play.</p><a class="button primary" href="/" data-route>Return to the editor</a></section></main>${footer()}`;
+  return `${header()}<main id="main" tabindex="-1"><section class="not-found"><p class="not-found-code">404</p><h1>Page not found</h1><p>This address does not lead to a page in ABC Score Play.</p><a class="button primary" href="/" data-route>Return to the editor</a></section></main>${footer()}`;
 }
 
 function readSharedScore(): string | null {
@@ -447,7 +447,7 @@ function renderRoute(focus = false): void {
   } else if (path === '/terms') {
     setMetadata('Terms — ABC Score Play', 'Terms for using ABC Score Play.', '/terms'); app.innerHTML = legalPage('terms');
   } else {
-    setMetadata('Page not found — ABC Score Play', 'Return to the ABC Score Play editor.', path); app.innerHTML = notFoundPage();
+    setMetadata('Page not found — ABC Score Play', 'The requested ABC Score Play page was not found.', path); app.innerHTML = notFoundPage();
   }
   bindRoutes();
   const focusDestination = (): void => {

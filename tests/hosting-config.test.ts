@@ -28,7 +28,9 @@ describe('Azure Static Web Apps routing contract', () => {
     expect(page).toContain('rel="apple-touch-icon"');
     expect(page).toContain('<main id="main"');
     expect(page.match(/<h1>/g)).toHaveLength(1);
-    expect(page).toContain('This bar is not in the score');
+    expect(page).toContain('<h1>Page not found</h1>');
+    expect(page).toContain('This address does not lead to a page in ABC Score Play.');
+    expect(page).not.toContain('This bar is not in the score');
     expect(page).toContain('Skip to page content');
     expect(page).toContain('aria-label="Main navigation"');
     expect(page).toContain('Built by Param Factory · v1.0.0 · Original generated artwork');
@@ -46,5 +48,28 @@ describe('Azure Static Web Apps routing contract', () => {
       expect(page).toContain(`href="https://abc-score-play.sociobot.in${canonical}"`);
       expect(page).toContain(`content="https://abc-score-play.sociobot.in${canonical}"`);
     }
+  });
+
+  it('pins the complete install used by the documented clean setup', () => {
+    const manifest = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as {
+      dependencies: Record<string, string>;
+      devDependencies: Record<string, string>;
+      engines: Record<string, string>;
+    };
+    const lock = JSON.parse(readFileSync(resolve(root, 'package-lock.json'), 'utf8')) as {
+      lockfileVersion: number;
+      packages: Record<string, {
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+        engines?: Record<string, string>;
+      }>;
+    };
+    const readme = readFileSync(resolve(root, 'README.md'), 'utf8');
+
+    expect(lock.lockfileVersion).toBe(3);
+    expect(lock.packages[''].dependencies).toEqual(manifest.dependencies);
+    expect(lock.packages[''].devDependencies).toEqual(manifest.devDependencies);
+    expect(lock.packages[''].engines).toEqual(manifest.engines);
+    expect(readme).toContain('npm ci');
   });
 });

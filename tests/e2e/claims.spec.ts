@@ -293,6 +293,8 @@ test('route titles, social metadata, raw heads, and consistent navigation are co
   await page.goto('/missing-bar');
   await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link')).toHaveText(['Demo', 'Editor', 'Privacy']);
   await expect(page.getByRole('navigation', { name: 'Footer navigation' }).getByRole('link')).toHaveText(['Privacy', 'Terms']);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found');
+  await expect(page.getByText('This address does not lead to a page in ABC Score Play.')).toBeVisible();
 });
 
 test('Start for real, direct editor links, and browser history focus the visible destination', async ({ page }) => {
@@ -375,10 +377,15 @@ test('keyboard access reaches the skip link and controls playback', async ({ pag
 });
 
 test('legal and unknown routes have one clear heading', async ({ page }) => {
-  for (const route of ['/privacy', '/terms', '/missing-bar']) {
+  for (const [route, heading] of [
+    ['/privacy', 'Keep your score on this device'],
+    ['/terms', 'Use the tool for scores you may share'],
+    ['/missing-bar', 'Page not found']
+  ]) {
     await page.goto(route);
     await expect(page.locator('main')).toBeVisible();
     await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('h1')).toHaveText(heading);
     expect(await page.title()).not.toBe('');
   }
 });
